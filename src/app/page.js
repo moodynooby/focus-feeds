@@ -2,13 +2,58 @@
 
 import { useState, useEffect } from "react";
 import { fetchFeeds } from "./actions"; // Import the server action
-
+import Box from "@mui/material/Box";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import * as React from "react";
+import Tab from "@mui/material/Tab";
+import TabContext from "@mui/lab/TabContext";
+import TabList from "@mui/lab/TabList";
+import TabPanel from "@mui/lab/TabPanel";
 export default function FeedManager() {
+  const [value, setValue] = React.useState("1");
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
   // 1. Manage your list of links here
   const [urls, setUrls] = useState([
     "https://hnrss.org/frontpage",
     "https://www.theverge.com/rss/index.xml",
   ]);
+  // Handler to remove a link
+  const handleRemove = (urlToRemove) => {
+    setUrls(urls.filter((url) => url !== urlToRemove));
+  };
+  const [showFeedManager, setshowFeedManager] = useState(true);
+  function BasicList({ urls }) {
+    return (
+      <Box sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
+        <nav aria-label="main mailbox folders">
+          <List>
+            {urls.map((url) => (
+              <ListItem key={url} disablePadding>
+                <ListItemText primary={url} />
+                <ListItemButton
+                  onClick={() => handleRemove(url)}
+                  style={{
+                    color: "red",
+                    border: "none",
+                    background: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Remove
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </nav>
+      </Box>
+    );
+  }
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,123 +85,93 @@ export default function FeedManager() {
     }
   };
 
-  // Handler to remove a link
-  const handleRemove = (urlToRemove) => {
-    setUrls(urls.filter((url) => url !== urlToRemove));
-  };
-
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem" }}>
-      {/* --- Control Panel --- */}
-      <div
-        style={{
-          marginBottom: "2rem",
-          padding: "1rem",
-          background: "#f5f5f5",
-          borderRadius: "8px",
-        }}
-      >
-        <h3 style={{ marginTop: 0 }}>Manage Feeds</h3>
-
-        <ul style={{ marginBottom: "1rem" }}>
-          {urls.map((url) => (
-            <li
-              key={url}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "0.5rem",
-              }}
-            >
-              <span style={{ fontSize: "0.9rem", fontFamily: "monospace" }}>
-                {url}
-              </span>
-              <button
-                onClick={() => handleRemove(url)}
-                style={{
-                  color: "red",
-                  border: "none",
-                  background: "none",
-                  cursor: "pointer",
-                }}
-              >
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
-
-        <form onSubmit={handleAdd} style={{ display: "flex", gap: "0.5rem" }}>
-          <input
-            type="url"
-            value={newUrl}
-            onChange={(e) => setNewUrl(e.target.value)}
-            placeholder="Enter RSS URL..."
-            required
-            style={{ flex: 1, padding: "0.5rem" }}
-          />
-          <button
-            type="submit"
-            style={{
-              padding: "0.5rem 1rem",
-              background: "black",
-              color: "white",
-              border: "none",
-            }}
-          >
-            Add Feed
-          </button>
-        </form>
-      </div>
-
-      {/* --- Feed Display --- */}
-      {loading ? (
-        <p>Loading feeds...</p>
-      ) : (
-        <div>
-          <h2 style={{ marginBottom: "1rem" }}>
-            Combined Feed ({items.length} items)
-          </h2>
-          {items.map((item, idx) => (
-            <div
-              key={idx}
-              style={{
-                marginBottom: "2rem",
-                borderBottom: "1px solid #eee",
-                paddingBottom: "1rem",
-              }}
-            >
-              <span
-                style={{
-                  background: "#eee",
-                  padding: "0.2rem 0.5rem",
-                  borderRadius: "4px",
-                  fontSize: "0.75rem",
-                  fontWeight: "bold",
-                  display: "inline-block",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                {item.source}
-              </span>
-
-              <h3 style={{ margin: "0.5rem 0" }}>
-                <a
-                  href={item.link}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ textDecoration: "none", color: "#0070f3" }}
+    <div style={{ maxWidth: "85vw", margin: "0 auto", padding: "2rem" }}>
+      <TabContext value={value}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <TabList onChange={handleChange}>
+            <Tab label="Focus Feeds" value="1" />
+            <Tab label="Feeds Manager" value="2" />
+            <Tab label="Settings" value="3" />
+          </TabList>
+        </Box>
+        <TabPanel value="1">
+          {/* --- Feed Display --- */}
+          {loading ? (
+            <p>Loading feeds...</p>
+          ) : (
+            <div>
+              <h2 style={{ marginBottom: "1rem" }}>
+                Combined Feed ({items.length} items)
+              </h2>
+              {items.map((item, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    marginBottom: "2rem",
+                    borderBottom: "1px solid #eee",
+                    paddingBottom: "1rem",
+                  }}
                 >
-                  {item.title}
-                </a>
-              </h3>
-              <div style={{ color: "#666", fontSize: "0.85rem" }}>
-                {new Date(item.pubDate).toLocaleString()}
-              </div>
+                  <span
+                    style={{
+                      background: "#eee",
+                      padding: "0.2rem 0.5rem",
+                      borderRadius: "4px",
+                      fontSize: "0.75rem",
+                      fontWeight: "bold",
+                      display: "inline-block",
+                      marginBottom: "0.5rem",
+                    }}
+                  >
+                    {item.source}
+                  </span>
+
+                  <h3 style={{ margin: "0.5rem 0" }}>
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ textDecoration: "none", color: "#0070f3" }}
+                    >
+                      {item.title}
+                    </a>
+                  </h3>
+                  <div style={{ color: "#666", fontSize: "0.85rem" }}>
+                    {new Date(item.pubDate).toLocaleString()}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+          )}
+        </TabPanel>
+        <TabPanel value="2">
+          <form onSubmit={handleAdd} style={{ display: "flex", gap: "0.5rem" }}>
+            <input
+              type="url"
+              value={newUrl}
+              onChange={(e) => setNewUrl(e.target.value)}
+              placeholder="Enter RSS URL..."
+              required
+              style={{ flex: 1, padding: "0.5rem" }}
+            />
+            <button
+              type="submit"
+              style={{
+                padding: "0.5rem 1rem",
+                background: "black",
+                color: "white",
+                border: "none",
+              }}
+            >
+              Add Feed
+            </button>
+          </form>
+
+          <BasicList urls={urls} />
+        </TabPanel>
+        <TabPanel value="3">Coming Soon</TabPanel>
+      </TabContext>
     </div>
   );
 }
