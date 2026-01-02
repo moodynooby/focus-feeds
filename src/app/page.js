@@ -15,7 +15,7 @@ import TabPanel from "@mui/lab/TabPanel";
 import Button from "@mui/material/Button";
 import Input from "@mui/material/Input";
 import { usePersistedUrls } from "../hooks/storage";
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from "@mui/icons-material/Delete";
 export default function FeedManager() {
   const [value, setValue] = React.useState("1");
 
@@ -33,21 +33,26 @@ export default function FeedManager() {
   const [showFeedManager, setshowFeedManager] = useState(true);
   function BasicList({ urls }) {
     return (
-      <Box
-      >
+      <Box>
         <nav aria-label="main mailbox folders">
           <List>
             {urls.map((url) => (
-              <ListItem key={url} style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems:"baseline",
-              }}>
-                <ListItemText primary={url}  style={{
-                  overflow: "scroll",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}/>
+              <ListItem
+                key={url}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "baseline",
+                }}
+              >
+                <ListItemText
+                  primary={url}
+                  style={{
+                    overflow: "scroll",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                />
                 <ListItemButton
                   onClick={() => handleRemove(url)}
                   style={{
@@ -103,28 +108,28 @@ export default function FeedManager() {
   };
 
   return (
-    <div style={{margin: "1px", padding: "2.2rem" , textWrap:"wrap"}}>
+    <div style={{ margin: "1px", padding: "2.2rem", textWrap: "wrap" }}>
       <TabContext value={value}>
-          <TabList 
-            onChange={handleChange}
-            variant="scrollable"
-            scrollButtons="auto"
-            sx={{
-              maxWidth: '100%',
-              '& .MuiTabs-scroller': {
-                overflowX: 'auto !important',
-                '&::-webkit-scrollbar': {
-                  display: 'none',
-                },
-                msOverflowStyle: 'none',
-                scrollbarWidth: 'none',
+        <TabList
+          onChange={handleChange}
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{
+            maxWidth: "100%",
+            "& .MuiTabs-scroller": {
+              overflowX: "auto !important",
+              "&::-webkit-scrollbar": {
+                display: "none",
               },
-            }}
-          >
-            <Tab label="Focus Feeds" value="1" />
-            <Tab label="Feeds Manager" value="2" />
-            <Tab label="Settings" value="3" />
-          </TabList>
+              msOverflowStyle: "none",
+              scrollbarWidth: "none",
+            },
+          }}
+        >
+          <Tab label="Focus Feeds" value="1" />
+          <Tab label="Feeds Manager" value="2" />
+          <Tab label="Settings" value="3" />
+        </TabList>
         <TabPanel value="1">
           {/* --- Feed Display --- */}
           {loading
@@ -142,20 +147,23 @@ export default function FeedManager() {
                       paddingBottom: "1rem",
                     }}
                   >
-                    <span
+                    <div
                       style={{
-                        padding: "0.2rem 0.5rem",
-                        borderRadius: "4px",
-                        fontSize: "0.75rem",
-                        fontWeight: "bold",
-                        display: "inline-block",
-                        marginBottom: "0.5rem",
-                        border: "1px solid #eee",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
                       }}
                     >
-                      {item.source}
-                    </span>
-
+                      <img
+                        src={`https://www.google.com/s2/favicons?domain=${new URL(item.link).hostname}&sz=32`}
+                        alt="favicon"
+                        onError={(e) => {
+                          e.target.src = "/fallback-icon.png";
+                        }} // Set a local fallback
+                        style={{ width: 16, height: 16, borderRadius: "4px" }}
+                      />
+                      <span style={{ fontWeight: "bold" }}>{item.source}</span>
+                    </div>
                     <h3 style={{ margin: "0.5rem 0" }}>
                       <a
                         href={item.link}
