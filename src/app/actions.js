@@ -5,27 +5,57 @@ import Parser from "rss-parser";
 export async function fetchFeeds(urls) {
   const parser = new Parser();
 
-  // Fetch all feeds in parallel using Promise.allSettled
-  // (This way, if one feed fails, the others still load)
-  const results = await Promise.allSettled(
-    urls.map((url) => parser.parseURL(url)),
-  );
+  // Validate input
+  if (!urls || urls.length === 0) {
+    return { 
+      success: false, 
+      error: "No feed URLs provided",
+      items: [] 
+    };
+  }
 
-  const allItems = [];
+  try {
+    const results = await Promise.allSettled(
+      urls.map((url) => parser.parseURL(url))
+    );
 
-  results.forEach((result) => {
-    if (result.status === "fulfilled") {
-      // Add the source title to each item so we know where it came from
-      const feedItems = result.value.items.map((item) => ({
-        ...item,
-        source: result.value.title || "Unknown Source",
-      }));
-      allItems.push(...feedItems);
-    } else {
-      console.error("Feed failed:", result.reason);
-    }
-  });
+    const allItems = [];
+    const failedFeeds = [];
 
-  // Sort all items by date (newest first)
-  return allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+    results.forEach((result, index) => {
+      if (result.status === "fulfilled") {
+        const feedItems = result.value.items.map((item) => ({
+          ...item,
+          source: result.value.title || "Unknown Source",
+          feedUrl: urls[index],
+        }));
+        allItems.push(...feedItems);
+      } else {
+        failedFeeds.push({
+          url: urls[index],
+          error: result.reason?.message || "Unknown error"
+        });
+        console.error(`Feed failed [${urls[index]}]:`, result.reason);
+      }
+    });
+
+    const sortedItems = allItems.sort(
+      (a, b) => new Date(b.pubDate) - new Date(a.pubDate)
+    );
+
+    return {
+      success: true,
+      items: sortedItems,
+      failedFeeds: failedFeeds.length > 0 ? failedFeeds : null,
+      timestamp: Date.now()
+    };
+
+  } catch (error) {
+    console.error("Unexpected error in fetchFeeds:", error);
+    return {
+      success: false,
+      error: error.message || "Failed to fetch feeds",
+      items: []
+    };
+  }
 }
