@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Focus Feeds
 
-## Getting Started
+Focus Feeds is a simple, minimalist RSS feed reader built with Next.js and Material UI. It allows you to combine multiple RSS feeds into a single, easy-to-read stream.
 
-First, run the development server:
+## Links
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- [Website](https://f-f2.netlify.app/)
+- [GitHub](https://github.com/moodynooby/focus-feeds)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- **Combine Multiple Feeds:** Add multiple RSS feed URLs to create a unified feed.
+- **Feed Management:** Easily add or remove feed sources.
+- **Manual Refresh:** Update your feeds with the latest content at any time.
+- **Caching:** Feeds are cached for 5 minutes to improve performance and reduce loading times.
+- **Responsive Design:** A clean and responsive layout that works on all devices.
+- **Favicon Support:** Displays favicons for each feed source for easy identification.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Demo / Screenshots
+TBD
 
-## Learn More
+## Setup
 
-To learn more about Next.js, take a look at the following resources:
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/moodynooby/focus-feeds.git
+    ```
+2.  **Install dependencies:**
+    ```bash
+    cd focus-feeds
+    bun install
+    ```
+3.  **Run the development server:**
+    ```bash
+    bun dev
+    ```
+    Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Release Notes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### v0.1.0 (Initial Release)
 
-## Deploy on Vercel
+-   Combine multiple RSS feeds into a single stream.
+-   Add and remove feed URLs.
+-   Manual refresh and caching of feeds.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License.

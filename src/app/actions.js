@@ -7,16 +7,16 @@ export async function fetchFeeds(urls) {
 
   // Validate input
   if (!urls || urls.length === 0) {
-    return { 
-      success: false, 
+    return {
+      success: false,
       error: "No feed URLs provided",
-      items: [] 
+      items: [],
     };
   }
 
   try {
     const results = await Promise.allSettled(
-      urls.map((url) => parser.parseURL(url))
+      urls.map((url) => parser.parseURL(url)),
     );
 
     const allItems = [];
@@ -33,29 +33,28 @@ export async function fetchFeeds(urls) {
       } else {
         failedFeeds.push({
           url: urls[index],
-          error: result.reason?.message || "Unknown error"
+          error: result.reason?.message || "Unknown error",
         });
         console.error(`Feed failed [${urls[index]}]:`, result.reason);
       }
     });
 
     const sortedItems = allItems.sort(
-      (a, b) => new Date(b.pubDate) - new Date(a.pubDate)
+      (a, b) => new Date(b.pubDate) - new Date(a.pubDate),
     );
 
     return {
       success: true,
       items: sortedItems,
       failedFeeds: failedFeeds.length > 0 ? failedFeeds : null,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-
   } catch (error) {
     console.error("Unexpected error in fetchFeeds:", error);
     return {
       success: false,
       error: error.message || "Failed to fetch feeds",
-      items: []
+      items: [],
     };
   }
 }
