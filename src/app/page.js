@@ -15,6 +15,7 @@ import TabPanel from "@mui/lab/TabPanel";
 import Button from "@mui/material/Button";
 import Input from "@mui/material/Input";
 import { usePersistedUrls } from "../hooks/storage";
+import DeleteIcon from '@mui/icons-material/Delete';
 export default function FeedManager() {
   const [value, setValue] = React.useState("1");
 
@@ -33,27 +34,35 @@ export default function FeedManager() {
   function BasicList({ urls }) {
     return (
       <Box
-        sx={{ width: "100%", maxWidth: "80vw", bgcolor: "background.paper" }}
       >
         <nav aria-label="main mailbox folders">
           <List>
             {urls.map((url) => (
-              <ListItem key={url}>
-                <ListItemText primary={url} />
+              <ListItem key={url} style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems:"baseline",
+              }}>
+                <ListItemText primary={url}  style={{
+                  overflow: "scroll",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}/>
                 <ListItemButton
                   onClick={() => handleRemove(url)}
                   style={{
                     color: "red",
-                    border: "red 1px solid",
                     background: "none",
                     cursor: "pointer",
                     width: "fit-content",
                     maxWidth: "fit-content",
                     padding: "5px",
                     borderRadius: "5px",
+                    textAlign: "center",
+                    minWidth: "30px",
                   }}
                 >
-                  Remove
+                  <DeleteIcon />
                 </ListItemButton>
               </ListItem>
             ))}
@@ -94,15 +103,28 @@ export default function FeedManager() {
   };
 
   return (
-    <div style={{ maxWidth: "85vw", margin: "0 auto", padding: "2rem" }}>
+    <div style={{margin: "1px", padding: "2.2rem" , textWrap:"wrap"}}>
       <TabContext value={value}>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <TabList onChange={handleChange}>
+          <TabList 
+            onChange={handleChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              maxWidth: '100%',
+              '& .MuiTabs-scroller': {
+                overflowX: 'auto !important',
+                '&::-webkit-scrollbar': {
+                  display: 'none',
+                },
+                msOverflowStyle: 'none',
+                scrollbarWidth: 'none',
+              },
+            }}
+          >
             <Tab label="Focus Feeds" value="1" />
             <Tab label="Feeds Manager" value="2" />
             <Tab label="Settings" value="3" />
           </TabList>
-        </Box>
         <TabPanel value="1">
           {/* --- Feed Display --- */}
           {loading
