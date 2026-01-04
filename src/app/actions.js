@@ -2,7 +2,7 @@
 
 import Parser from "rss-parser";
 
-export async function fetchFeeds(urls) {
+export async function fetchFeeds(urls, duration = "week") {
   const parser = new Parser();
 
   // Validate input
@@ -14,6 +14,18 @@ export async function fetchFeeds(urls) {
     };
   }
 
+  // Calculate cutoff date
+  let cutoffDate = null;
+  const now = new Date();
+  if (duration === "today") {
+    cutoffDate = new Date(now.setHours(0, 0, 0, 0));
+  } else if (duration === "week") {
+    cutoffDate = new Date(now.setDate(now.getDate() - 7));
+  } else if (duration === "month") {
+    cutoffDate = new Date(now.setDate(now.getDate() - 30));
+  }
+  // "all" leaves cutoffDate as null
+
   try {
     const results = await Promise.allSettled(
       urls.map((url) => parser.parseURL(url)),
@@ -24,11 +36,34 @@ export async function fetchFeeds(urls) {
 
     results.forEach((result, index) => {
       if (result.status === "fulfilled") {
-        const feedItems = result.value.items.map((item) => ({
-          ...item,
-          source: result.value.title || "Unknown Source",
-          feedUrl: urls[index],
-        }));
+        const feedItems = result.value.items
+          .filter((item) => {
+            if (!cutoffDate) return true;
+            const itemDate = new Date(item.pubDate);
+            return !isNaN(itemDate) && itemDate >= cutoffDate;
+          })
+          .map((item) => {
+            // Explicitly extract primitive values to ensure serializability
+            const mapped = {
+              title: String(item.title || ""),
+              link: String(item.link || ""),
+              pubDate: String(item.pubDate || ""),
+              content: String(item.content || item.contentSnippet || ""),
+              contentSnippet: String(item.contentSnippet || ""),
+              guid: String(item.guid || ""),
+              source: String(result.value.title || "Unknown Source"),
+              feedUrl: String(urls[index]),
+              isPodcast: Boolean(
+                item.enclosure?.url && item.enclosure?.type?.startsWith("audio/"),
+              ),
+              audioUrl: item.enclosure?.url ? String(item.enclosure.url) : null,
+              audioType: item.enclosure?.type ? String(item.enclosure.type) : null,
+              duration: item.itunes?.duration
+                ? String(item.itunes.duration)
+                : null,
+            };
+            return mapped;
+          });
         allItems.push(...feedItems);
       } else {
         failedFeeds.push({
@@ -42,6 +77,8 @@ export async function fetchFeeds(urls) {
     const sortedItems = allItems.sort(
       (a, b) => new Date(b.pubDate) - new Date(a.pubDate),
     );
+
+    console.log("fetchFeeds success, returning", sortedItems.length, "items");
 
     return {
       success: true,

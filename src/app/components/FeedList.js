@@ -6,6 +6,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import FeedItem from "./FeedItem";
+import PodcastItem from "./PodcastItem";
 
 export default function FeedList({
     loading,
@@ -70,9 +71,13 @@ export default function FeedList({
                 </Alert>
             )}
 
-            {items.map((item, idx) => (
-                <FeedItem key={idx} item={item} />
-            ))}
+            {items.map((item, idx) =>
+                item.isPodcast ? (
+                    <PodcastItem key={idx} item={item} />
+                ) : (
+                    <FeedItem key={idx} item={item} />
+                ),
+            )}
         </Box>
     );
 }

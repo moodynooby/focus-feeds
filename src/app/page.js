@@ -18,6 +18,7 @@ export default function FeedManager() {
     "https://www.theverge.com/rss/index.xml",
   ]);
   const [initLoadDone, setInitLoadDone] = useState(false);
+  const [duration, setDuration] = useState("week"); // Default to week
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true); // Start loading true to fetch defaults
@@ -51,13 +52,13 @@ export default function FeedManager() {
     }
   };
 
-  // Persistence for URLs
+  // Persistence for URLs and Duration
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("focusFeedsUrls");
-      if (saved) {
+      const savedUrls = localStorage.getItem("focusFeedsUrls");
+      if (savedUrls) {
         try {
-          const parsed = JSON.parse(saved);
+          const parsed = JSON.parse(savedUrls);
           if (Array.isArray(parsed)) {
             setUrls(parsed);
           }
@@ -65,6 +66,12 @@ export default function FeedManager() {
           console.error("Failed to parse saved feeds", e);
         }
       }
+
+      const savedDuration = localStorage.getItem("focusFeedsDuration");
+      if (savedDuration) {
+        setDuration(savedDuration);
+      }
+
       setInitLoadDone(true);
     }
   }, []);
@@ -72,8 +79,9 @@ export default function FeedManager() {
   useEffect(() => {
     if (initLoadDone) {
       localStorage.setItem("focusFeedsUrls", JSON.stringify(urls));
+      localStorage.setItem("focusFeedsDuration", duration);
     }
-  }, [urls, initLoadDone]);
+  }, [urls, duration, initLoadDone]);
 
   const cacheRef = useRef(new Map());
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
@@ -91,7 +99,8 @@ export default function FeedManager() {
       // Create new abort controller for this request
       abortControllerRef.current = new AbortController();
 
-      const cacheKey = urls.sort().join(",");
+      // Include duration in cache key
+      const cacheKey = urls.sort().join(",") + `|${duration}`;
       const cached = cacheRef.current.get(cacheKey);
 
       // Check cache (unless force refresh)
@@ -119,7 +128,7 @@ export default function FeedManager() {
       }
 
       try {
-        const response = await fetchFeeds(urls);
+        const response = await fetchFeeds(urls, duration);
 
         // Check if request was aborted
         if (abortControllerRef.current?.signal.aborted) {
@@ -232,6 +241,8 @@ export default function FeedManager() {
             lastRefresh={lastRefresh}
             onRefresh={() => loadFeeds(true)}
             onClearCache={clearCache}
+            duration={duration}
+            onDurationChange={setDuration}
           />
         </TabPanel>
       </TabContext>

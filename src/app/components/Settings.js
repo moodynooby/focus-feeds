@@ -11,6 +11,8 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DownloadIcon from "@mui/icons-material/Download";
 import CircularProgress from "@mui/material/CircularProgress";
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { useTheme } from "@mui/material/styles";
 import { ColorModeContext } from "../theme";
 
@@ -22,6 +24,8 @@ export default function Settings({
     lastRefresh,
     onRefresh,
     onClearCache,
+    duration,
+    onDurationChange,
 }) {
     const theme = useTheme();
     const colorMode = useContext(ColorModeContext);
@@ -39,8 +43,62 @@ export default function Settings({
         return lastRefresh.toLocaleTimeString();
     };
 
+    const handleDurationChange = (event, newDuration) => {
+        if (newDuration !== null) {
+            onDurationChange(newDuration);
+        }
+    };
+
     return (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            {/* Feed Settings */}
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 3,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 2,
+                }}
+            >
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                        gap: 2,
+                    }}
+                >
+                    <Box>
+                        <Typography variant="h6" sx={{ fontSize: "1rem", fontWeight: 600 }}>
+                            Feed Duration
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                            Limit items to a specific time range
+                        </Typography>
+                    </Box>
+                    <ToggleButtonGroup
+                        value={duration}
+                        exclusive
+                        onChange={handleDurationChange}
+                        aria-label="feed duration"
+                        size="small"
+                        sx={{
+                            "& .MuiToggleButton-root": {
+                                textTransform: "capitalize",
+                                px: 2,
+                            }
+                        }}
+                    >
+                        <ToggleButton value="today">Today</ToggleButton>
+                        <ToggleButton value="week">Week</ToggleButton>
+                        <ToggleButton value="month">Month</ToggleButton>
+                        <ToggleButton value="all">All</ToggleButton>
+                    </ToggleButtonGroup>
+                </Box>
+            </Paper>
+
             {/* Theme Settings */}
             <Paper
                 elevation={0}
