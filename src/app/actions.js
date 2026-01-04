@@ -54,10 +54,13 @@ export async function fetchFeeds(urls, duration = "week") {
               source: String(result.value.title || "Unknown Source"),
               feedUrl: String(urls[index]),
               isPodcast: Boolean(
-                item.enclosure?.url && item.enclosure?.type?.startsWith("audio/"),
+                item.enclosure?.url &&
+                  item.enclosure?.type?.startsWith("audio/"),
               ),
               audioUrl: item.enclosure?.url ? String(item.enclosure.url) : null,
-              audioType: item.enclosure?.type ? String(item.enclosure.type) : null,
+              audioType: item.enclosure?.type
+                ? String(item.enclosure.type)
+                : null,
               duration: item.itunes?.duration
                 ? String(item.itunes.duration)
                 : null,

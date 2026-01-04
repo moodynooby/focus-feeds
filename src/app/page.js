@@ -1,21 +1,21 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import Box from "@mui/material/Box";
-import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
+import Box from "@mui/material/Box";
+import Tab from "@mui/material/Tab";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchFeeds } from "./actions";
-import FeedList from "./components/FeedList";
 import AddFeed from "./components/AddFeed";
+import FeedList from "./components/FeedList";
 import Settings from "./components/Settings";
 
 export default function FeedManager() {
   const [value, setValue] = useState("1");
   const [urls, setUrls] = useState([
     "https://hnrss.org/frontpage",
-    "https://www.theverge.com/rss/index.xml",
+    "https://feeds.megaphone.fm/vergecast",
   ]);
   const [initLoadDone, setInitLoadDone] = useState(false);
   const [duration, setDuration] = useState("week"); // Default to week

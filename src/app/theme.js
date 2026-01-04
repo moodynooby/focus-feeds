@@ -1,9 +1,9 @@
 "use client";
 
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Inter } from "next/font/google";
-import { createContext, useState, useEffect, useMemo, useContext } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const inter = Inter({
   weight: ["300", "400", "500", "600", "700"],
@@ -11,7 +11,7 @@ const inter = Inter({
   display: "swap",
 });
 
-export const ColorModeContext = createContext({ toggleColorMode: () => { } });
+export const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
 // Theme Design System
 const getDesignTokens = (mode) => ({
@@ -19,53 +19,53 @@ const getDesignTokens = (mode) => ({
     mode,
     ...(mode === "dark"
       ? {
-        // Dark Mode Palette
-        primary: {
-          main: "#f8fafc", // Zinc 50
-          light: "#ffffff",
-          dark: "#cbd5e1",
-          contrastText: "#09090b",
-        },
-        secondary: {
-          main: "#a1a1aa", // Zinc 400
-          light: "#d4d4d8",
-          dark: "#52525b",
-          contrastText: "#09090b",
-        },
-        background: {
-          default: "#09090b", // Zinc 950
-          paper: "#18181b", // Zinc 900
-        },
-        text: {
-          primary: "#f8fafc",
-          secondary: "#a1a1aa",
-        },
-        divider: "rgba(255, 255, 255, 0.08)",
-      }
+          // Dark Mode Palette
+          primary: {
+            main: "#f8fafc", // Zinc 50
+            light: "#ffffff",
+            dark: "#cbd5e1",
+            contrastText: "#09090b",
+          },
+          secondary: {
+            main: "#a1a1aa", // Zinc 400
+            light: "#d4d4d8",
+            dark: "#52525b",
+            contrastText: "#09090b",
+          },
+          background: {
+            default: "#09090b", // Zinc 950
+            paper: "#18181b", // Zinc 900
+          },
+          text: {
+            primary: "#f8fafc",
+            secondary: "#a1a1aa",
+          },
+          divider: "rgba(255, 255, 255, 0.08)",
+        }
       : {
-        // Light Mode Palette
-        primary: {
-          main: "#18181b", // Zinc 900
-          light: "#27272a",
-          dark: "#000000",
-          contrastText: "#ffffff",
-        },
-        secondary: {
-          main: "#71717a", // Zinc 500
-          light: "#a1a1aa",
-          dark: "#52525b",
-          contrastText: "#ffffff",
-        },
-        background: {
-          default: "#ffffff",
-          paper: "#f8fafc", // Zinc 50
-        },
-        text: {
-          primary: "#09090b", // Zinc 950
-          secondary: "#52525b", // Zinc 600
-        },
-        divider: "rgba(0, 0, 0, 0.08)",
-      }),
+          // Light Mode Palette
+          primary: {
+            main: "#18181b", // Zinc 900
+            light: "#27272a",
+            dark: "#000000",
+            contrastText: "#ffffff",
+          },
+          secondary: {
+            main: "#71717a", // Zinc 500
+            light: "#a1a1aa",
+            dark: "#52525b",
+            contrastText: "#ffffff",
+          },
+          background: {
+            default: "#ffffff",
+            paper: "#f8fafc", // Zinc 50
+          },
+          text: {
+            primary: "#09090b", // Zinc 950
+            secondary: "#52525b", // Zinc 600
+          },
+          divider: "rgba(0, 0, 0, 0.08)",
+        }),
   },
   typography: {
     fontFamily: inter.style.fontFamily,
@@ -148,17 +148,17 @@ const getDesignTokens = (mode) => ({
             border: `2px solid ${mode === "dark" ? "#09090b" : "#ffffff"}`,
           },
           "&::-webkit-scrollbar-thumb:focus, & *::-webkit-scrollbar-thumb:focus":
-          {
-            backgroundColor: mode === "dark" ? "#3f3f46" : "#d4d4d8",
-          },
+            {
+              backgroundColor: mode === "dark" ? "#3f3f46" : "#d4d4d8",
+            },
           "&::-webkit-scrollbar-thumb:active, & *::-webkit-scrollbar-thumb:active":
-          {
-            backgroundColor: mode === "dark" ? "#3f3f46" : "#d4d4d8",
-          },
+            {
+              backgroundColor: mode === "dark" ? "#3f3f46" : "#d4d4d8",
+            },
           "&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover":
-          {
-            backgroundColor: mode === "dark" ? "#3f3f46" : "#d4d4d8",
-          },
+            {
+              backgroundColor: mode === "dark" ? "#3f3f46" : "#d4d4d8",
+            },
         },
       },
     },
