@@ -73,9 +73,11 @@ export default function FeedList({
       )}
 
       {items.map((item, idx) =>
-        item.isPodcast
-          ? <PodcastItem key={idx} item={item} />
-          : <FeedItem key={idx} item={item} />,
+        item.isPodcast ? (
+          <PodcastItem key={idx} item={item} />
+        ) : (
+          <FeedItem key={idx} item={item} />
+        ),
       )}
     </Box>
   );

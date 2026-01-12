@@ -15,6 +15,7 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
 import { useContext } from "react";
 import { ColorModeContext } from "../theme";
+import SignIn from "./signIn";
 
 export default function Settings({
   deferredPrompt,
@@ -51,6 +52,16 @@ export default function Settings({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        {/* <SignIn /> */}
+      </Box>
+
       {/* Feed Settings */}
       <Paper
         elevation={0}
@@ -128,9 +139,11 @@ export default function Settings({
             onClick={colorMode.toggleColorMode}
             sx={{ bgcolor: "background.default" }}
           >
-            {theme.palette.mode === "dark"
-              ? <LightModeIcon />
-              : <DarkModeIcon />}
+            {theme.palette.mode === "dark" ? (
+              <LightModeIcon />
+            ) : (
+              <DarkModeIcon />
+            )}
           </IconButton>
         </Box>
       </Paper>
@@ -219,9 +232,11 @@ export default function Settings({
             variant="outlined"
             size="small"
             startIcon={
-              loading
-                ? <CircularProgress size={16} color="inherit" />
-                : <RefreshIcon />
+              loading ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : (
+                <RefreshIcon />
+              )
             }
             onClick={onRefresh}
             disabled={loading}
