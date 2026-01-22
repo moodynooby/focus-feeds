@@ -1,5 +1,7 @@
 import "./globals.css";
 import ThemeRegistry from "./theme";
+import { Providers } from "./providers";
+
 export const metadata = {
   title: "Focus Feeds",
   description: "A platform for managing and focusing on feeds.",
@@ -22,7 +24,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <ThemeRegistry> {children}</ThemeRegistry>
+        <ThemeRegistry>
+          <Providers>{children}</Providers>
+        </ThemeRegistry>
       </body>
     </html>
   );

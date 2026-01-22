@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 
 export default function SignIn() {
   return (
-    <Button onClick={() => signIn("GitHub")} variant="contained">
+    <Button onClick={() => signIn("github")} variant="contained">
       Sign In
     </Button>
   );

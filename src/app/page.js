@@ -6,22 +6,27 @@ import TabPanel from "@mui/lab/TabPanel";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { fetchFeeds } from "./actions";
+import {
+  fetchFeeds,
+  getUserFeeds,
+  addUserFeed,
+  removeUserFeed,
+  syncFeeds,
+} from "./actions";
 import AddFeed from "./components/AddFeed";
 import FeedList from "./components/FeedList";
 import Settings from "./components/Settings";
+import { useSession } from "next-auth/react";
 
 export default function FeedManager() {
+  const { data: session, status } = useSession();
   const [value, setValue] = useState("1");
-  const [urls, setUrls] = useState([
-    "https://hnrss.org/frontpage",
-    "https://feeds.megaphone.fm/vergecast",
-  ]);
+  const [urls, setUrls] = useState([]);
   const [initLoadDone, setInitLoadDone] = useState(false);
   const [duration, setDuration] = useState("week"); // Default to week
 
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true); // Start loading true to fetch defaults
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [failedFeeds, setFailedFeeds] = useState(null);
   const [lastRefresh, setLastRefresh] = useState(null);
@@ -52,36 +57,89 @@ export default function FeedManager() {
     }
   };
 
-  // Persistence for URLs and Duration
+  // Initial Load (Auth vs Local)
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const savedUrls = localStorage.getItem("focusFeedsUrls");
-      if (savedUrls) {
-        try {
-          const parsed = JSON.parse(savedUrls);
-          if (Array.isArray(parsed)) {
-            setUrls(parsed);
+    if (typeof window === "undefined") return;
+
+    // Wait for session to be loading
+    if (status === "loading") return;
+
+    const loadInitialData = async () => {
+      let loadedUrls = [];
+      let loadedDuration = "week";
+
+      if (status === "authenticated") {
+        // Sync Logic:
+        // 1. Get local feeds
+        const localSavedUrls = localStorage.getItem("focusFeedsUrls");
+        let localFeeds = [];
+        if (localSavedUrls) {
+          try {
+            const parsed = JSON.parse(localSavedUrls);
+            if (Array.isArray(parsed)) localFeeds = parsed;
+          } catch (e) { }
+        }
+
+        // 2. Perform Sync if local feeds exist (or even if empty, to get remote)
+        // If we want to merge, we send localFeeds.
+        const result = await syncFeeds(localFeeds);
+
+        if (result.success) {
+          loadedUrls = result.feeds.map(f => f.url);
+          // Optional: Clear local storage or keep it in sync? 
+          // Let's keep it in sync for offline fallback, but generally we rely on DB now.
+        } else {
+          console.error("Failed to sync/load user feeds", result.error);
+        }
+
+        const savedDuration = localStorage.getItem("focusFeedsDuration");
+        if (savedDuration) loadedDuration = savedDuration;
+
+      } else {
+        // Load from LocalStorage
+        const savedUrls = localStorage.getItem("focusFeedsUrls");
+        if (savedUrls) {
+          try {
+            const parsed = JSON.parse(savedUrls);
+            if (Array.isArray(parsed)) {
+              loadedUrls = parsed;
+            }
+          } catch (e) {
+            console.error("Failed to parse saved feeds", e);
           }
-        } catch (e) {
-          console.error("Failed to parse saved feeds", e);
+        } else {
+          // Defaults for new unauth users
+          loadedUrls = [
+            "https://hnrss.org/frontpage",
+            "https://feeds.megaphone.fm/vergecast",
+          ];
+        }
+
+        const savedDuration = localStorage.getItem("focusFeedsDuration");
+        if (savedDuration) {
+          loadedDuration = savedDuration;
         }
       }
 
-      const savedDuration = localStorage.getItem("focusFeedsDuration");
-      if (savedDuration) {
-        setDuration(savedDuration);
-      }
-
+      setUrls(loadedUrls);
+      setDuration(loadedDuration);
       setInitLoadDone(true);
-    }
-  }, []);
+    };
 
+    loadInitialData();
+  }, [status]);
+
+  // Sync back to local storage if unauthenticated
   useEffect(() => {
-    if (initLoadDone) {
+    if (initLoadDone && status === "unauthenticated") {
       localStorage.setItem("focusFeedsUrls", JSON.stringify(urls));
       localStorage.setItem("focusFeedsDuration", duration);
     }
-  }, [urls, duration, initLoadDone]);
+    // Always save duration locally for now
+    if (initLoadDone) {
+      localStorage.setItem("focusFeedsDuration", duration);
+    }
+  }, [urls, duration, initLoadDone, status]);
 
   const cacheRef = useRef(new Map());
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
@@ -89,7 +147,12 @@ export default function FeedManager() {
 
   const loadFeeds = useCallback(
     async (forceRefresh = false) => {
-      if (!initLoadDone && urls.length === 0) return;
+      if (!initLoadDone) return;
+      if (urls.length === 0 && initLoadDone) {
+        setItems([]);
+        setLoading(false);
+        return;
+      }
 
       // Cancel any pending request
       if (abortControllerRef.current) {
@@ -159,7 +222,7 @@ export default function FeedManager() {
         setLoading(false);
       }
     },
-    [urls, initLoadDone],
+    [urls, initLoadDone, duration],
   );
 
   // Auto-load when URLs useffect-init triggers, or when URLs change
@@ -175,14 +238,32 @@ export default function FeedManager() {
     };
   }, [loadFeeds, initLoadDone]);
 
-  const handleRemove = (urlToRemove) => {
-    setUrls(urls.filter((url) => url !== urlToRemove));
+  const handleRemove = async (urlToRemove) => {
+    // Optimistic or wait? Let's optimistic for UI but parallel req
+    setUrls((prev) => prev.filter((url) => url !== urlToRemove));
+
+    if (status === "authenticated") {
+      const result = await removeUserFeed(urlToRemove);
+      if (!result.success) {
+        // Revert on failure?
+        console.error("Failed to remove feed remotely");
+        // Could add back, but for now simple logging
+      }
+    }
   };
 
-  const handleAdd = (newUrl) => {
+  const handleAdd = async (newUrl) => {
     if (newUrl && !urls.includes(newUrl)) {
-      setUrls([...urls, newUrl]);
+      setUrls((prev) => [...prev, newUrl]);
       setValue("1"); // Switch back to feed view
+
+      if (status === "authenticated") {
+        const result = await addUserFeed(newUrl);
+        if (!result.success) {
+          console.error("Failed to add feed remotely");
+          // Could show toast
+        }
+      }
     }
   };
 

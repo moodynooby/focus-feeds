@@ -15,6 +15,7 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
 import { useContext } from "react";
 import { ColorModeContext } from "../theme";
+import { useSession, signOut } from "next-auth/react";
 import SignIn from "./signIn";
 
 export default function Settings({
@@ -28,6 +29,7 @@ export default function Settings({
   duration,
   onDurationChange,
 }) {
+  const { data: session, status } = useSession();
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
 
@@ -58,8 +60,39 @@ export default function Settings({
           justifyContent: "space-between",
           alignItems: "center",
         }}
+      >      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 2,
+        }}
       >
-        {/* <SignIn /> */}
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <Typography variant="h6" sx={{ fontSize: "1.1rem", fontWeight: 700 }}>
+              Account
+            </Typography>
+            {status === "authenticated" ? (
+              <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                <Box>
+                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                    {session.user?.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                    {session.user?.email}
+                  </Typography>
+                </Box>
+                <Button variant="outlined" color="primary" onClick={() => signOut()}>
+                  Sign Out
+                </Button>
+              </Box>
+            ) : (
+              <SignIn />
+            )}
+          </Box>
+        </Paper>
       </Box>
 
       {/* Feed Settings */}
