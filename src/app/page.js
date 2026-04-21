@@ -1,5 +1,8 @@
 "use client";
 
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import RssFeedIcon from "@mui/icons-material/RssFeed";
+import SettingsIcon from "@mui/icons-material/Settings";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
@@ -362,9 +365,24 @@ export default function FeedManager() {
 						},
 					}}
 				>
-					<Tab label="Focus Feeds" value="1" />
-					<Tab label="Feeds Manager" value="2" />
-					<Tab label="Settings" value="3" />
+					<Tab
+						icon={<RssFeedIcon />}
+						iconPosition="start"
+						label="Focus Feeds"
+						value="1"
+					/>
+					<Tab
+						icon={<AddCircleIcon />}
+						iconPosition="start"
+						label="Feeds Manager"
+						value="2"
+					/>
+					<Tab
+						icon={<SettingsIcon />}
+						iconPosition="start"
+						label="Settings"
+						value="3"
+					/>
 				</TabList>
 
 				<TabPanel value="1" sx={{ px: 0 }}>

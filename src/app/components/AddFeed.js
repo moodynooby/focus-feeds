@@ -1,5 +1,7 @@
 "use client";
 
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import LinkIcon from "@mui/icons-material/Link";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -7,7 +9,10 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import Divider from "@mui/material/Divider";
 import Input from "@mui/material/Input";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
 import { useState } from "react";
 
 export default function AddFeed({ urls, onAdd, onRemove }) {
@@ -42,65 +47,102 @@ export default function AddFeed({ urls, onAdd, onRemove }) {
 	};
 
 	return (
-		<Box>
-			<Box
-				component="form"
-				onSubmit={handleSubmit}
-				sx={{ display: "flex", gap: 1, mb: 3 }}
+		<Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+			<Paper
+				elevation={1}
+				sx={{
+					p: 3,
+					border: "1px solid",
+					borderColor: "divider",
+					borderRadius: 2,
+				}}
 			>
-				<Input
-					type="url"
-					value={newUrl}
-					onChange={(e) => setNewUrl(e.target.value)}
-					placeholder="Enter RSS URL..."
-					required
-					sx={{ flex: 1, p: 1 }}
-					autoComplete="off"
-				/>
-				<Button type="submit" variant="contained">
-					Add Feed
-				</Button>
-			</Box>
+				<Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+					<AddCircleIcon color="primary" />
+					<Typography variant="h6" sx={{ fontSize: "1.1rem", fontWeight: 700 }}>
+						Add New Feed
+					</Typography>
+				</Box>
+				<Box
+					component="form"
+					onSubmit={handleSubmit}
+					sx={{ display: "flex", gap: 1 }}
+				>
+					<Input
+						type="url"
+						value={newUrl}
+						onChange={(e) => setNewUrl(e.target.value)}
+						placeholder="Enter RSS URL..."
+						required
+						sx={{ flex: 1, p: 1 }}
+						autoComplete="off"
+					/>
+					<Button type="submit" variant="contained">
+						Add Feed
+					</Button>
+				</Box>
+			</Paper>
 
-			{}
-			<Box sx={{ width: "98%" }}>
-				{urls.map((url) => (
-					<Box
-						key={url}
-						sx={{
-							display: "flex",
-							justifyContent: "space-between",
-							alignItems: "center",
-							p: 1,
-							borderBottom: "1px solid #eee",
-						}}
+			<Paper
+				elevation={1}
+				sx={{
+					p: 3,
+					border: "1px solid",
+					borderColor: "divider",
+					borderRadius: 2,
+				}}
+			>
+				<Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+					<LinkIcon color="primary" />
+					<Typography variant="h6" sx={{ fontSize: "1.1rem", fontWeight: 700 }}>
+						Your Feeds
+					</Typography>
+					<Typography
+						variant="body2"
+						sx={{ color: "text.secondary", ml: "auto" }}
 					>
-						<span style={{ flex: 1, wordBreak: "break-all" }}>{url}</span>
-						<Button
-							size="small"
-							color="error"
-							onClick={() => handleDeleteClick(url)}
-							sx={{ ml: 1 }}
+						{urls.length} feed{urls.length !== 1 ? "s" : ""}
+					</Typography>
+				</Box>
+				<Box>
+					{urls.map((url, index) => (
+						<Box key={url}>
+							<Box
+								sx={{
+									display: "flex",
+									justifyContent: "space-between",
+									alignItems: "center",
+									py: 1.5,
+								}}
+							>
+								<span style={{ flex: 1, wordBreak: "break-all" }}>{url}</span>
+								<Button
+									size="small"
+									color="error"
+									onClick={() => handleDeleteClick(url)}
+									sx={{ ml: 1 }}
+								>
+									Remove
+								</Button>
+							</Box>
+							{index < urls.length - 1 && <Divider />}
+						</Box>
+					))}
+					{urls.length === 0 && (
+						<Box
+							sx={{
+								textAlign: "center",
+								fontStyle: "italic",
+								opacity: 0.6,
+								py: 2,
+							}}
 						>
-							Remove
-						</Button>
-					</Box>
-				))}
-				{urls.length === 0 && (
-					<Box
-						sx={{
-							textAlign: "center",
-							fontStyle: "italic",
-							opacity: 0.6,
-							mt: 2,
-						}}
-					>
-						No feeds added yet. Add one above!
-					</Box>
-				)}
-			</Box>
+							No feeds added yet. Add one above!
+						</Box>
+					)}
+				</Box>
+			</Paper>
 
-			{}
 			<Dialog open={deleteConfirmOpen} onClose={handleCancelDelete}>
 				<DialogTitle>remove Feed?</DialogTitle>
 				<DialogContent>

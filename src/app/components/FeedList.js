@@ -4,6 +4,7 @@ import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
+import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import FeedItem from "./FeedItem";
 import PodcastItem from "./PodcastItem";
@@ -50,14 +51,12 @@ export default function FeedList({
 
 	return (
 		<Box>
-			{}
 			{error && (
 				<Alert severity="error" sx={{ mb: 2 }}>
 					<strong>Error:</strong> {error}
 				</Alert>
 			)}
 
-			{}
 			{failedFeeds && (
 				<Alert severity="warning" sx={{ mb: 2 }}>
 					<strong>Some feeds failed to load:</strong>
@@ -71,13 +70,13 @@ export default function FeedList({
 				</Alert>
 			)}
 
-			{items.map((item) =>
-				item.isPodcast ? (
-					<PodcastItem key={item.guid || item.link} item={item} />
-				) : (
-					<FeedItem key={item.guid || item.link} item={item} />
-				),
-			)}
+				{items.map((item) =>
+					item.isPodcast ? (
+						<PodcastItem key={item.guid || item.link} item={item} />
+					) : (
+						<FeedItem key={item.guid || item.link} item={item} />
+					),
+				)}
 		</Box>
 	);
 }

@@ -45,7 +45,6 @@ export default function PodcastItem({ item }) {
 				},
 			}}
 		>
-			{}
 			<Box
 				sx={{
 					display: "flex",
@@ -69,7 +68,7 @@ export default function PodcastItem({ item }) {
 				>
 					{item.source}
 				</Box>
-				{}
+
 				<Box
 					sx={{
 						display: "flex",
@@ -89,7 +88,7 @@ export default function PodcastItem({ item }) {
 					<HeadphonesIcon sx={{ fontSize: 12 }} />
 					Podcast
 				</Box>
-				{}
+
 				{item.duration && (
 					<Box
 						sx={{
@@ -112,7 +111,6 @@ export default function PodcastItem({ item }) {
 				</Box>
 			</Box>
 
-			{}
 			<Box component="h3" sx={{ m: 0, mb: 1 }}>
 				<Box
 					component="a"
@@ -132,7 +130,6 @@ export default function PodcastItem({ item }) {
 				</Box>
 			</Box>
 
-			{}
 			<PodcastPlayer audioUrl={item.audioUrl} audioType={item.audioType} />
 		</Paper>
 	);
