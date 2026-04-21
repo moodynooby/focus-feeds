@@ -1,218 +1,291 @@
 "use server";
 
-import Parser from "rss-parser";
-import { auth } from "./auth";
-import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import Parser from "rss-parser";
+import { sql } from "@/lib/db";
+import { getCurrentUser } from "@/lib/simple-auth";
 
 export async function fetchFeeds(urls, duration = "week") {
-  const parser = new Parser();
+	const parser = new Parser();
 
-  // Validate input
-  if (!urls || urls.length === 0) {
-    return {
-      success: false,
-      error: "No feed URLs provided",
-      items: [],
-    };
-  }
+	if (!urls || urls.length === 0) {
+		return {
+			success: false,
+			error: "No feed URLs provided",
+			items: [],
+		};
+	}
 
-  // Calculate cutoff date
-  let cutoffDate = null;
-  const now = new Date();
-  if (duration === "today") {
-    cutoffDate = new Date(now.setHours(0, 0, 0, 0));
-  } else if (duration === "week") {
-    cutoffDate = new Date(now.setDate(now.getDate() - 7));
-  } else if (duration === "month") {
-    cutoffDate = new Date(now.setDate(now.getDate() - 30));
-  }
-  // "all" leaves cutoffDate as null
+	let cutoffDate = null;
+	const now = new Date();
+	if (duration === "today") {
+		cutoffDate = new Date(now.setHours(0, 0, 0, 0));
+	} else if (duration === "week") {
+		cutoffDate = new Date(now.setDate(now.getDate() - 7));
+	} else if (duration === "month") {
+		cutoffDate = new Date(now.setDate(now.getDate() - 30));
+	}
 
-  try {
-    const results = await Promise.allSettled(
-      urls.map((url) => parser.parseURL(url)),
-    );
+	try {
+		const results = await Promise.allSettled(
+			urls.map((url) => parser.parseURL(url)),
+		);
 
-    const allItems = [];
-    const failedFeeds = [];
+		const allItems = [];
+		const failedFeeds = [];
 
-    results.forEach((result, index) => {
-      if (result.status === "fulfilled") {
-        const feedItems = result.value.items
-          .filter((item) => {
-            if (!cutoffDate) return true;
-            const itemDate = new Date(item.pubDate);
-            return !isNaN(itemDate) && itemDate >= cutoffDate;
-          })
-          .map((item) => {
-            // Explicitly extract primitive values to ensure serializability
-            const mapped = {
-              title: String(item.title || ""),
-              link: String(item.link || ""),
-              pubDate: String(item.pubDate || ""),
-              content: String(item.content || item.contentSnippet || ""),
-              contentSnippet: String(item.contentSnippet || ""),
-              guid: String(item.guid || ""),
-              source: String(result.value.title || "Unknown Source"),
-              feedUrl: String(urls[index]),
-              isPodcast: Boolean(
-                item.enclosure?.url &&
-                item.enclosure?.type?.startsWith("audio/"),
-              ),
-              audioUrl: item.enclosure?.url ? String(item.enclosure.url) : null,
-              audioType: item.enclosure?.type
-                ? String(item.enclosure.type)
-                : null,
-              duration: item.itunes?.duration
-                ? String(item.itunes.duration)
-                : null,
-            };
-            return mapped;
-          });
-        allItems.push(...feedItems);
-      } else {
-        failedFeeds.push({
-          url: urls[index],
-          error: result.reason?.message || "Unknown error",
-        });
-        console.error(`Feed failed [${urls[index]}]:`, result.reason);
-      }
-    });
+		results.forEach((result, index) => {
+			if (result.status === "fulfilled") {
+				const feedItems = result.value.items
+					.filter((item) => {
+						if (!cutoffDate) return true;
+						const itemDate = new Date(item.pubDate);
+						return !Number.isNaN(itemDate) && itemDate >= cutoffDate;
+					})
+					.map((item) => {
+						const mapped = {
+							title: String(item.title || ""),
+							link: String(item.link || ""),
+							pubDate: String(item.pubDate || ""),
+							content: String(item.content || item.contentSnippet || ""),
+							contentSnippet: String(item.contentSnippet || ""),
+							guid: String(item.guid || ""),
+							source: String(result.value.title || "Unknown Source"),
+							feedUrl: String(urls[index]),
+							isPodcast: Boolean(
+								item.enclosure?.url &&
+									item.enclosure?.type?.startsWith("audio/"),
+							),
+							audioUrl: item.enclosure?.url ? String(item.enclosure.url) : null,
+							audioType: item.enclosure?.type
+								? String(item.enclosure.type)
+								: null,
+							duration: item.itunes?.duration
+								? String(item.itunes.duration)
+								: null,
+						};
+						return mapped;
+					});
+				allItems.push(...feedItems);
+			} else {
+				failedFeeds.push({
+					url: urls[index],
+					error: result.reason?.message || "Unknown error",
+				});
+				console.error(`Feed failed [${urls[index]}]:`, result.reason);
+			}
+		});
 
-    const sortedItems = allItems.sort(
-      (a, b) => new Date(b.pubDate) - new Date(a.pubDate),
-    );
+		const sortedItems = allItems.sort(
+			(a, b) => new Date(b.pubDate) - new Date(a.pubDate),
+		);
 
-    console.log("fetchFeeds success, returning", sortedItems.length, "items");
+		console.log("fetchFeeds success, returning", sortedItems.length, "items");
 
-    return {
-      success: true,
-      items: sortedItems,
-      failedFeeds: failedFeeds.length > 0 ? failedFeeds : null,
-      timestamp: Date.now(),
-    };
-  } catch (error) {
-    console.error("Unexpected error in fetchFeeds:", error);
-    return {
-      success: false,
-      error: error.message || "Failed to fetch feeds",
-      items: [],
-    };
-  }
+		return {
+			success: true,
+			items: sortedItems,
+			failedFeeds: failedFeeds.length > 0 ? failedFeeds : null,
+			timestamp: Date.now(),
+		};
+	} catch (error) {
+		console.error("Unexpected error in fetchFeeds:", error);
+		return {
+			success: false,
+			error: error.message || "Failed to fetch feeds",
+			items: [],
+		};
+	}
 }
 
 export async function getUserFeeds() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { success: false, error: "Not authenticated" };
-  }
+	const user = await getCurrentUser();
+	if (!user?.id) {
+		return { success: false, error: "Not authenticated" };
+	}
 
-  try {
-    const feeds = await prisma.feed.findMany({
-      where: { userId: session.user.id },
-      select: { url: true, id: true },
-    });
-    return { success: true, feeds };
-  } catch (error) {
-    console.error("Failed to get user feeds:", error);
-    return { success: false, error: "Failed to load feeds" };
-  }
+	try {
+		const feeds = await sql`
+      SELECT id, url FROM "Feed"
+      WHERE "userId" = ${user.id}
+    `;
+		return { success: true, feeds };
+	} catch (error) {
+		console.error("Failed to get user feeds:", error);
+		return { success: false, error: "Failed to load feeds" };
+	}
 }
 
 export async function addUserFeed(url) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { success: false, error: "Not authenticated" };
-  }
+	const user = await getCurrentUser();
+	if (!user?.id) {
+		return { success: false, error: "Not authenticated" };
+	}
 
-  if (!url) {
-    return { success: false, error: "URL is required" };
-  }
+	if (!url) {
+		return { success: false, error: "URL is required" };
+	}
 
-  try {
-    await prisma.feed.create({
-      data: {
-        url,
-        userId: session.user.id,
-      },
-    });
-    revalidatePath("/");
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to add feed:", error);
-    if (error.code === "P2002") {
-      // Unique constraint
-      return { success: false, error: "Feed already exists" };
-    }
-    return { success: false, error: "Failed to save feed" };
-  }
+	try {
+		await sql`
+      INSERT INTO "Feed" (id, url, "userId", "createdAt")
+      VALUES (gen_random_uuid(), ${url}, ${user.id}, NOW())
+    `;
+		revalidatePath("/");
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to add feed:", error);
+		if (error.code === "23505") {
+			return { success: false, error: "Feed already exists" };
+		}
+		return { success: false, error: "Failed to save feed" };
+	}
 }
 
 export async function removeUserFeed(url) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { success: false, error: "Not authenticated" };
-  }
+	const user = await getCurrentUser();
+	if (!user?.id) {
+		return { success: false, error: "Not authenticated" };
+	}
 
-  try {
-    // We remove by url + userId since we don't always track IDs in frontend state easily without refactor
-    // But since (userId, url) is unique, this is safe.
-    await prisma.feed.deleteMany({
-      where: {
-        userId: session.user.id,
-        url: url,
-      },
-    });
-    revalidatePath("/");
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to remove feed:", error);
-    return { success: false, error: "Failed to remove feed" };
-  }
+	try {
+		await sql`
+      DELETE FROM "Feed"
+      WHERE "userId" = ${user.id} AND url = ${url}
+    `;
+		revalidatePath("/");
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to remove feed:", error);
+		return { success: false, error: "Failed to remove feed" };
+	}
 }
 
-export async function syncFeeds(localUrls) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { success: false, error: "Not authenticated" };
-  }
+export async function syncFeeds(localUrls, options = {}) {
+	const user = await getCurrentUser();
+	if (!user?.id) {
+		return { success: false, error: "Not authenticated" };
+	}
 
-  try {
-    const userId = session.user.id;
+	const userId = user.id;
+	const { mergeStrategy = "merge" } = options;
 
-    // 1. Get existing DB feeds
-    const existingFeeds = await prisma.feed.findMany({
-      where: { userId },
-      select: { url: true },
-    });
-    const existingUrls = new Set(existingFeeds.map(f => f.url));
+	try {
+		const existingFeeds = await sql`
+      SELECT url FROM "Feed"
+      WHERE "userId" = ${userId}
+    `;
+		const existingUrls = new Set(existingFeeds.map((f) => f.url));
 
-    // 2. Identify new feeds to add
-    // Filter out null/undefined/empty strings just in case
-    const validLocalUrls = (localUrls || []).filter(u => u && typeof u === 'string');
-    const newUrls = validLocalUrls.filter(url => !existingUrls.has(url));
+		const validLocalUrls = (localUrls || []).filter(
+			(u) => u && typeof u === "string" && u.trim() !== "",
+		);
+		const localUrlsSet = new Set(validLocalUrls);
 
-    // 3. Bulk create new feeds
-    if (newUrls.length > 0) {
-      await prisma.feed.createMany({
-        data: newUrls.map(url => ({
-          userId,
-          url,
-        })),
-      });
-    }
+		let finalUrls = [];
+		let addedToDb = [];
+		let pulledFromDb = [];
 
-    // 4. Return updated full list
-    const allFeeds = await prisma.feed.findMany({
-      where: { userId },
-      select: { url: true, id: true },
-    });
+		if (mergeStrategy === "push") {
+			const urlsToDelete = [...existingUrls].filter(
+				(url) => !localUrlsSet.has(url),
+			);
+			if (urlsToDelete.length > 0) {
+				await sql`
+          DELETE FROM "Feed"
+          WHERE "userId" = ${userId}
+          AND url = ANY(${urlsToDelete}::text[])
+        `;
+			}
+			const newUrls = validLocalUrls.filter((url) => !existingUrls.has(url));
+			if (newUrls.length > 0) {
+				for (const url of newUrls) {
+					await sql`
+            INSERT INTO "Feed" (id, url, "userId", "createdAt")
+            VALUES (gen_random_uuid(), ${url}, ${userId}, NOW())
+            ON CONFLICT ("userId", url) DO NOTHING
+          `;
+				}
+				addedToDb = newUrls;
+			}
+			finalUrls = validLocalUrls;
+		} else if (mergeStrategy === "pull") {
+			finalUrls = [...existingUrls];
+			pulledFromDb = [...existingUrls];
+		} else {
+			const newUrls = validLocalUrls.filter((url) => !existingUrls.has(url));
+			if (newUrls.length > 0) {
+				for (const url of newUrls) {
+					await sql`
+            INSERT INTO "Feed" (id, url, "userId", "createdAt")
+            VALUES (gen_random_uuid(), ${url}, ${userId}, NOW())
+            ON CONFLICT ("userId", url) DO NOTHING
+          `;
+				}
+				addedToDb = newUrls;
+			}
 
-    revalidatePath("/");
-    return { success: true, feeds: allFeeds };
-  } catch (error) {
-    console.error("Failed to sync feeds:", error);
-    return { success: false, error: "Failed to sync feeds" };
-  }
+			const serverOnlyUrls = [...existingUrls].filter(
+				(url) => !localUrlsSet.has(url),
+			);
+			pulledFromDb = serverOnlyUrls;
+
+			finalUrls = [...new Set([...validLocalUrls, ...existingUrls])];
+		}
+
+		const allFeeds = await sql`
+      SELECT id, url FROM "Feed"
+      WHERE "userId" = ${userId}
+    `;
+
+		revalidatePath("/");
+		return {
+			success: true,
+			feeds: allFeeds,
+			syncInfo: {
+				addedToDb,
+				pulledFromDb,
+				localCount: validLocalUrls.length,
+				serverCount: existingUrls.size,
+				finalCount: finalUrls.length,
+				strategy: mergeStrategy,
+			},
+		};
+	} catch (error) {
+		console.error("Failed to sync feeds:", error);
+		return { success: false, error: "Failed to sync feeds" };
+	}
+}
+
+export async function createOrGetUser(passphrase) {
+	if (!passphrase || passphrase.trim() === "") {
+		return { success: false, error: "Passphrase is required" };
+	}
+
+	if (passphrase.length < 4) {
+		return {
+			success: false,
+			error: "Passphrase must be at least 4 characters",
+		};
+	}
+
+	try {
+		const { getOrCreateUser } = await import("@/lib/simple-auth");
+		const user = await getOrCreateUser(passphrase);
+
+		if (!user) {
+			return { success: false, error: "Failed to create or get user" };
+		}
+
+		return {
+			success: true,
+			user: {
+				id: user.id,
+				createdAt: user.createdAt,
+			},
+		};
+	} catch (error) {
+		console.error("Failed to create/get user:", error);
+		return { success: false, error: "Failed to create account" };
+	}
 }

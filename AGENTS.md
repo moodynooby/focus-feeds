@@ -2,11 +2,11 @@
 
 ## Build and Development Commands
 
-- **Development**: `bun dev` or `npm run dev` - Starts Next.js dev server on port 3000
-- **Build**: `bun run build` or `npm run build` - Builds for production
-- **Production start**: `bun start` or `npm start` - Runs production server
-- **Lint**: `bun run lint` or `npm run lint` - Runs Biome linter
-- **Format**: `bun run format` or `npm run format` - Auto-formats code with Biome
+- **Development**: `pnpm dev` or `npm run dev` - Starts Next.js dev server on port 3000
+- **Build**: `pnpm run build` or `npm run build` - Builds for production
+- **Production start**: `pnpm start` or `npm start` - Runs production server
+- **Lint**: `pnpm run lint` or `npm run lint` - Runs Biome linter
+- **Format**: `pnpm run format` or `npm run format` - Auto-formats code with Biome
 - **Single test**: No test runner configured; use console.log() for debugging
 
 ## Architecture and Structure

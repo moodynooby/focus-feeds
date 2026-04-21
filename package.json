@@ -1,42 +1,28 @@
 {
-  "name": "focus-feeds",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "biome check",
-    "format": "biome format --write",
-    "postinstall": "prisma generate"
-  },
-  "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^7.3.7",
-    "@mui/lab": "^7.0.1-beta.21",
-    "@mui/material": "^7.3.7",
-    "next": "16.1.4",
-    "next-auth": "^5.0.0-beta.30",
-    "plyr-react": "^6.0.0",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "rss-parser": "^3.13.0"
-  },
-  "devDependencies": {
-    "@auth/prisma-adapter": "^2.11.1",
-    "@biomejs/biome": "2.3.11",
-    "@prisma/client": "^6.19.2",
-    "@tailwindcss/postcss": "^4",
-    "prisma": "^6.19.2",
-    "tailwindcss": "^4"
-  },
-  "ignoreScripts": [
-    "sharp",
-    "unrs-resolver"
-  ],
-  "trustedDependencies": [
-    "sharp",
-    "unrs-resolver"
-  ]
+	"name": "focus-feeds",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "biome check --fix",
+		"format": "biome format --write"
+	},
+	"dependencies": {
+		"@emotion/react": "^11.14.0",
+		"@emotion/styled": "^11.14.1",
+		"@mui/icons-material": "^7.3.10",
+		"@mui/lab": "7.0.1-beta.24",
+		"@mui/material": "^7.3.10",
+		"@neondatabase/serverless": "^1.1.0",
+		"next": "16.1.4",
+		"plyr-react": "^6.0.0",
+		"react": "19.2.3",
+		"react-dom": "19.2.3",
+		"rss-parser": "^3.13.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.3.11"
+	}
 }

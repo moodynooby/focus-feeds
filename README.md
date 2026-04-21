@@ -28,11 +28,11 @@ TBD
 2.  **Install dependencies:**
     ```bash
     cd focus-feeds
-    bun install
+    pnpm install
     ```
 3.  **Run the development server:**
     ```bash
-    bun dev
+    pnpm dev
     ```
     Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
