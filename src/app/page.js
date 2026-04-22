@@ -1,21 +1,13 @@
 "use client";
 
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import RssFeedIcon from "@mui/icons-material/RssFeed";
-import SettingsIcon from "@mui/icons-material/Settings";
-import TabContext from "@mui/lab/TabContext";
-import TabList from "@mui/lab/TabList";
-import TabPanel from "@mui/lab/TabPanel";
 import Box from "@mui/material/Box";
-import Tab from "@mui/material/Tab";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { addUserFeed, fetchFeeds, removeUserFeed, syncFeeds } from "./actions";
-import AddFeed from "./components/AddFeed";
 import FeedList from "./components/FeedList";
-import Settings from "./components/Settings";
+import FilterHeader from "./components/filter-header";
+import SettingsDrawer from "./components/SettingsDrawer";
 
 function useSimpleSession() {
-	const [session, setSession] = useState(null);
 	const [status, setStatus] = useState("loading");
 
 	useEffect(() => {
@@ -27,19 +19,11 @@ function useSimpleSession() {
 				});
 				if (response.ok) {
 					const data = await response.json();
-					if (data.authenticated) {
-						setSession({ user: { id: data.userId } });
-						setStatus("authenticated");
-					} else {
-						setSession(null);
-						setStatus("unauthenticated");
-					}
+					setStatus(data.authenticated ? "authenticated" : "unauthenticated");
 				} else {
-					setSession(null);
 					setStatus("unauthenticated");
 				}
 			} catch {
-				setSession(null);
 				setStatus("unauthenticated");
 			}
 		};
@@ -47,12 +31,12 @@ function useSimpleSession() {
 		checkSession();
 	}, []);
 
-	return { data: session, status };
+	return { status };
 }
 
 export default function FeedManager() {
-	const { data: session, status } = useSimpleSession();
-	const [value, setValue] = useState("1");
+	const { status } = useSimpleSession();
+	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [urls, setUrls] = useState([]);
 	const [initLoadDone, setInitLoadDone] = useState(false);
 	const [duration, setDuration] = useState("week");
@@ -69,6 +53,11 @@ export default function FeedManager() {
 		lastSync: null,
 		info: null,
 	});
+
+	const [searchQuery, setSearchQuery] = useState("");
+	const [selectedSources, setSelectedSources] = useState([]);
+	const ITEMS_PER_BATCH = 20;
+	const [displayLimit, setDisplayLimit] = useState(ITEMS_PER_BATCH);
 
 	useEffect(() => {
 		const handleBeforeInstallPrompt = (e) => {
@@ -281,7 +270,6 @@ export default function FeedManager() {
 	const handleAdd = async (newUrl) => {
 		if (newUrl && !urls.includes(newUrl)) {
 			setUrls((prev) => [...prev, newUrl]);
-			setValue("1");
 
 			if (status === "authenticated") {
 				const result = await addUserFeed(newUrl);
@@ -292,8 +280,17 @@ export default function FeedManager() {
 		}
 	};
 
-	const handleChange = (_event, newValue) => {
-		setValue(newValue);
+	const handleOpenDrawer = () => {
+		setDrawerOpen(true);
+	};
+
+	const handleClearFilters = () => {
+		setSearchQuery("");
+		setSelectedSources([]);
+	};
+
+	const handleCloseDrawer = () => {
+		setDrawerOpen(false);
 	};
 
 	const handleSignOut = async () => {
@@ -308,116 +305,90 @@ export default function FeedManager() {
 		}
 	};
 
-	const handleSync = async () => {
-		if (status !== "authenticated") return;
-
-		setSyncStatus((prev) => ({ ...prev, loading: true, error: null }));
-
-		try {
-			const result = await syncFeeds(urls, { mergeStrategy: "merge" });
-
-			if (result.success) {
-				setUrls(result.feeds.map((f) => f.url));
-				setSyncStatus({
-					loading: false,
-					error: null,
-					lastSync: Date.now(),
-					info: result.syncInfo,
-				});
-			} else {
-				setSyncStatus({
-					loading: false,
-					error: result.error,
-					lastSync: syncStatus.lastSync,
-					info: null,
-				});
-			}
-		} catch (_err) {
-			setSyncStatus({
-				loading: false,
-				error: "Sync failed",
-				lastSync: syncStatus.lastSync,
-				info: null,
-			});
-		}
-	};
-
 	const clearCache = () => {
 		cacheRef.current.clear();
 		loadFeeds(true);
 	};
 
+	const handleLoadMore = () => {
+		setDisplayLimit((prev) => prev + ITEMS_PER_BATCH);
+	};
+
+	const sources = [
+		...new Set(items.map((item) => item.feedTitle || item.source || "Unknown")),
+	].sort();
+
+	const filteredItems = items.filter((item) => {
+		const matchesSearch = searchQuery
+			? (item.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+				(item.contentSnippet || "")
+					.toLowerCase()
+					.includes(searchQuery.toLowerCase()) ||
+				(item.content || "").toLowerCase().includes(searchQuery.toLowerCase())
+			: true;
+
+		const matchesSource =
+			selectedSources.length > 0
+				? selectedSources.includes(item.feedTitle || item.source || "Unknown")
+				: true;
+
+		return matchesSearch && matchesSource;
+	});
+
+	const visibleItems = filteredItems.slice(0, displayLimit);
+	const hasMoreItems = filteredItems.length > displayLimit;
+
+	useEffect(() => {
+		setDisplayLimit(ITEMS_PER_BATCH);
+	}, [searchQuery, selectedSources, ITEMS_PER_BATCH]);
+
 	return (
-		<Box sx={{ maxWidth: "800px", mx: "auto", p: 4 }}>
-			<TabContext value={value}>
-				<TabList
-					onChange={handleChange}
-					variant="scrollable"
-					scrollButtons="auto"
-					sx={{
-						maxWidth: "100%",
-						mb: 2,
-						"& .MuiTabs-scroller": {
-							overflowX: "auto !important",
-							"&::-webkit-scrollbar": { display: "none" },
-							msOverflowStyle: "none",
-							scrollbarWidth: "none",
-						},
-					}}
-				>
-					<Tab
-						icon={<RssFeedIcon />}
-						iconPosition="start"
-						label="Focus Feeds"
-						value="1"
-					/>
-					<Tab
-						icon={<AddCircleIcon />}
-						iconPosition="start"
-						label="Feeds Manager"
-						value="2"
-					/>
-					<Tab
-						icon={<SettingsIcon />}
-						iconPosition="start"
-						label="Settings"
-						value="3"
-					/>
-				</TabList>
+		<>
+			<FilterHeader
+				searchQuery={searchQuery}
+				onSearchChange={setSearchQuery}
+				sources={sources}
+				selectedSources={selectedSources}
+				onSourcesChange={setSelectedSources}
+				onRefresh={() => loadFeeds(true)}
+				onOpenSettings={handleOpenDrawer}
+				onClearFilters={handleClearFilters}
+				filteredCount={filteredItems.length}
+				totalCount={items.length}
+				loading={loading}
+			/>
 
-				<TabPanel value="1" sx={{ px: 0 }}>
-					<FeedList
-						loading={loading}
-						error={error}
-						failedFeeds={failedFeeds}
-						items={items}
-						onRefresh={() => loadFeeds(true)}
-					/>
-				</TabPanel>
+			<Box sx={{ maxWidth: "800px", mx: "auto", pb: 4, pt: 2 }}>
+				<FeedList
+					loading={loading}
+					error={error}
+					failedFeeds={failedFeeds}
+					items={visibleItems}
+					onRefresh={() => loadFeeds(true)}
+					hasMoreItems={hasMoreItems}
+					onLoadMore={handleLoadMore}
+					totalCount={filteredItems.length}
+				/>
 
-				<TabPanel value="2" sx={{ px: 0 }}>
-					<AddFeed urls={urls} onAdd={handleAdd} onRemove={handleRemove} />
-				</TabPanel>
-
-				<TabPanel value="3" sx={{ px: 0 }}>
-					<Settings
-						deferredPrompt={deferredPrompt}
-						onInstall={handleInstallClick}
-						loading={loading}
-						itemsCount={items.length}
-						lastRefresh={lastRefresh}
-						onRefresh={() => loadFeeds(true)}
-						onClearCache={clearCache}
-						duration={duration}
-						onDurationChange={setDuration}
-						syncStatus={syncStatus}
-						onSync={handleSync}
-						session={session}
-						status={status}
-						onSignOut={handleSignOut}
-					/>
-				</TabPanel>
-			</TabContext>
-		</Box>
+				<SettingsDrawer
+					open={drawerOpen}
+					onClose={handleCloseDrawer}
+					urls={urls}
+					onAdd={handleAdd}
+					onRemove={handleRemove}
+					itemsCount={items.length}
+					lastRefresh={lastRefresh}
+					onRefresh={() => loadFeeds(true)}
+					onClearCache={clearCache}
+					duration={duration}
+					onDurationChange={setDuration}
+					syncStatus={syncStatus}
+					status={status}
+					onSignOut={handleSignOut}
+					deferredPrompt={deferredPrompt}
+					onInstall={handleInstallClick}
+				/>
+			</Box>
+		</>
 	);
 }

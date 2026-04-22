@@ -12,17 +12,16 @@
 	"dependencies": {
 		"@emotion/react": "^11.14.0",
 		"@emotion/styled": "^11.14.1",
-		"@mui/icons-material": "^7.3.10",
-		"@mui/lab": "7.0.1-beta.24",
-		"@mui/material": "^7.3.10",
+		"@mui/icons-material": "^9.0.0",
+		"@mui/material": "^9.0.0",
 		"@neondatabase/serverless": "^1.1.0",
-		"next": "16.1.4",
+		"next": "16.2.4",
 		"plyr-react": "^6.0.0",
-		"react": "19.2.3",
-		"react-dom": "19.2.3",
+		"react": "19.2.5",
+		"react-dom": "19.2.5",
 		"rss-parser": "^3.13.0"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.3.11"
+		"@biomejs/biome": "2.4.12"
 	}
 }

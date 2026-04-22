@@ -3,14 +3,10 @@
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
+import { getHostname } from "./utils";
 
 export default function FeedItem({ item }) {
-	let hostname = "";
-	try {
-		hostname = new URL(item.link).hostname;
-	} catch (_e) {
-		hostname = "example.com";
-	}
+	const hostname = getHostname(item.link);
 
 	return (
 		<Paper

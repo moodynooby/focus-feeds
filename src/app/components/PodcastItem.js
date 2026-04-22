@@ -5,14 +5,10 @@ import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import PodcastPlayer from "./PodcastPlayer";
+import { getHostname } from "./utils";
 
 export default function PodcastItem({ item }) {
-	let hostname = "";
-	try {
-		hostname = new URL(item.link).hostname;
-	} catch (_e) {
-		hostname = "example.com";
-	}
+	const hostname = getHostname(item.link);
 
 	const formatDuration = (duration) => {
 		if (!duration) return null;
