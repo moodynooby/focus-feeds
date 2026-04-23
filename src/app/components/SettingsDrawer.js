@@ -21,6 +21,7 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
 import { useContext, useState } from "react";
 import { ColorModeContext } from "../theme";
+import SignIn from "./signIn";
 
 export default function SettingsDrawer({
 	open,
@@ -320,9 +321,7 @@ export default function SettingsDrawer({
 										</Button>
 									</Box>
 								) : (
-									<Typography variant="body2" color="text.secondary">
-										Not signed in. Sign in to sync feeds across devices.
-									</Typography>
+									<SignIn />
 								)}
 								{syncStatus?.loading && (
 									<Typography
