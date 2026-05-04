@@ -13,6 +13,7 @@ import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import DOMPurify from "isomorphic-dompurify";
+import PodcastPlayer from "../PodcastPlayer";
 
 export default function GhostArticleView({ item, onBack }) {
 	if (!item) return null;
@@ -90,14 +91,51 @@ export default function GhostArticleView({ item, onBack }) {
 				<Box
 					sx={{
 						lineHeight: 1.6,
-						"& img": { maxWidth: "100%", height: "auto" },
-						"& a": { color: "primary.main" },
+						fontSize: "1rem",
+						color: "text.primary",
+						"& img": {
+							maxWidth: "100%",
+							height: "auto",
+							borderRadius: 1,
+							my: 2,
+						},
+						"& a": { color: "primary.main", textDecoration: "none" },
+						"& a:hover": { textDecoration: "underline" },
+						"& p": { mb: 2 },
+						"& ul, & ol": { mb: 2, pl: 4 },
+						"& li": { mb: 1 },
+						"& blockquote": {
+							borderLeft: "4px solid",
+							borderColor: "divider",
+							pl: 2,
+							ml: 0,
+							my: 2,
+							color: "text.secondary",
+							fontStyle: "italic",
+						},
+						"& pre": {
+							bgcolor: "action.hover",
+							p: 2,
+							borderRadius: 1,
+							overflowX: "auto",
+							fontFamily: "monospace",
+							fontSize: "0.9rem",
+							my: 2,
+						},
 					}}
 					// biome-ignore lint/security/noDangerouslySetInnerHtml: Sanitized with DOMPurify
 					dangerouslySetInnerHTML={{
 						__html: DOMPurify.sanitize(item.content),
 					}}
 				/>
+				{item.isPodcast && (
+					<Box sx={{ mt: 4 }}>
+						<PodcastPlayer
+							audioUrl={item.audioUrl}
+							audioType={item.audioType}
+						/>
+					</Box>
+				)}
 			</Box>
 		</Paper>
 	);

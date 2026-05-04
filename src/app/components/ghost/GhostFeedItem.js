@@ -1,5 +1,6 @@
 "use client";
 
+import HeadphonesOutlinedIcon from "@mui/icons-material/HeadphonesOutlined";
 import StarBorderOutlinedIcon from "@mui/icons-material/StarBorderOutlined";
 import StarOutlinedIcon from "@mui/icons-material/StarOutlined";
 import Box from "@mui/material/Box";
@@ -59,19 +60,30 @@ export default function GhostFeedItem({
 				</IconButton>
 			</Box>
 
-			<Typography
-				variant="body2"
-				noWrap
+			<Box
 				sx={{
 					minWidth: 150,
-					fontWeight: 700,
-					overflow: "hidden",
-					textOverflow: "ellipsis",
+					display: "flex",
+					alignItems: "center",
+					gap: 1,
 					mr: 2,
 				}}
 			>
-				{item.source}
-			</Typography>
+				{item.isPodcast && (
+					<HeadphonesOutlinedIcon sx={{ fontSize: 16, color: "#a855f7" }} />
+				)}
+				<Typography
+					variant="body2"
+					noWrap
+					sx={{
+						fontWeight: 700,
+						overflow: "hidden",
+						textOverflow: "ellipsis",
+					}}
+				>
+					{item.source}
+				</Typography>
+			</Box>
 
 			<Box
 				sx={{
