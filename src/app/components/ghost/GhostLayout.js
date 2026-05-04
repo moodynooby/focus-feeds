@@ -2,6 +2,7 @@
 
 import Box from "@mui/material/Box";
 import { ThemeProvider, useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { useState } from "react";
 import { ghostTheme } from "../../ghost-theme";
 import GhostArticleView from "./GhostArticleView";
@@ -23,19 +24,14 @@ export default function GhostLayout({
 	status,
 	loading,
 	onAddFeed,
+	view,
+	onViewChange,
 }) {
 	const theme = useTheme();
 	const mode = theme.palette.mode;
-	const [sidebarOpen, setSidebarOpen] = useState(true);
-	const [view, setView] = useState("inbox"); // inbox, starred
+	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+	const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
 	const [selectedArticle, setSelectedArticle] = useState(null);
-
-	const filteredItems = items.filter((item) => {
-		if (view === "starred") {
-			return starredItems.includes(item.guid || item.link);
-		}
-		return true;
-	});
 
 	return (
 		<ThemeProvider theme={ghostTheme(mode)}>
@@ -50,15 +46,18 @@ export default function GhostLayout({
 				/>
 				<GhostSidebar
 					open={sidebarOpen}
+					onClose={() => setSidebarOpen(false)}
 					sources={sources}
 					selectedSources={selectedSources}
 					onSourcesChange={onSourcesChange}
 					view={view}
 					onViewChange={(v) => {
-						setView(v);
+						onViewChange(v);
 						setSelectedArticle(null);
+						if (isMobile) setSidebarOpen(false);
 					}}
 					onAddFeed={onAddFeed}
+					isMobile={isMobile}
 				/>
 				<Box
 					component="main"
@@ -95,7 +94,7 @@ export default function GhostLayout({
 							/>
 						) : (
 							<GhostFeedList
-								items={filteredItems}
+								items={items}
 								starredItems={starredItems}
 								onToggleStar={onToggleStar}
 								onSelectItem={setSelectedArticle}

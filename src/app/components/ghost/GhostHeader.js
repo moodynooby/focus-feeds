@@ -1,12 +1,12 @@
 "use client";
 
-import AppsIcon from "@mui/icons-material/Apps";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
-import HelpIcon from "@mui/icons-material/Help";
-import LightModeIcon from "@mui/icons-material/LightMode";
-import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
-import SettingsIcon from "@mui/icons-material/Settings";
+import AppsOutlinedIcon from "@mui/icons-material/AppsOutlined";
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
+import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -64,21 +64,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 	},
 }));
 
-const APPS = [
-	{ name: "Jmail", url: "https://jmail.world/", icon: "📧" },
-	{ name: "JPhotos", url: "https://jmail.world/photos", icon: "🖼️" },
-	{ name: "JDrive", url: "https://jmail.world/drive/new-only", icon: "📁" },
-	{ name: "JCal", url: "https://jmail.world/calendar", icon: "📅" },
-	{ name: "JFlights", url: "https://jmail.world/flights", icon: "✈️" },
-	{ name: "JVR", url: "https://jmail.world/vr", icon: "🥽" },
-	{ name: "Jamazon", url: "https://jmail.world/jamazon", icon: "📦" },
-	{ name: "Jemini", url: "https://jmail.world/jemini", icon: "💎" },
-	{ name: "Jotify", url: "https://jmail.world/jotify", icon: "🎵" },
-	{ name: "JMessage", url: "https://jmail.world/messages", icon: "💬" },
-	{ name: "Jacebook", url: "https://jmail.world/jacebook", icon: "👤" },
-	{ name: "JeffTube", url: "https://jmail.world/jefftube", icon: "📺" },
-	{ name: "Jwiki", url: "https://jmail.world/wiki", icon: "📖" },
-];
+import { GHOST_APPS } from "./config";
 
 export default function GhostHeader({
 	searchQuery,
@@ -118,11 +104,16 @@ export default function GhostHeader({
 					aria-label="menu"
 					onClick={onToggleSidebar}
 				>
-					<MenuIcon />
+					<MenuOutlinedIcon />
 				</IconButton>
 
 				<Box
-					sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 120 }}
+					sx={{
+						display: { xs: "none", sm: "flex" },
+						alignItems: "center",
+						gap: 1,
+						minWidth: 120,
+					}}
 				>
 					<Typography
 						variant="h6"
@@ -136,7 +127,7 @@ export default function GhostHeader({
 
 				<Search>
 					<SearchIconWrapper>
-						<SearchIcon />
+						<SearchOutlinedIcon />
 					</SearchIconWrapper>
 					<StyledInputBase
 						placeholder="Search mail"
@@ -154,19 +145,22 @@ export default function GhostHeader({
 						onClick={() => colorMode.toggleColorMode()}
 					>
 						{theme.palette.mode === "dark" ? (
-							<LightModeIcon />
+							<LightModeOutlinedIcon />
 						) : (
-							<DarkModeIcon />
+							<DarkModeOutlinedIcon />
 						)}
 					</IconButton>
-					<IconButton color="inherit">
-						<HelpIcon />
+					<IconButton
+						color="inherit"
+						sx={{ display: { xs: "none", sm: "flex" } }}
+					>
+						<HelpOutlineOutlinedIcon />
 					</IconButton>
 					<IconButton color="inherit" onClick={onOpenSettings}>
-						<SettingsIcon />
+						<SettingsOutlinedIcon />
 					</IconButton>
 					<IconButton color="inherit" onClick={handleOpenApps}>
-						<AppsIcon />
+						<AppsOutlinedIcon />
 					</IconButton>
 					<IconButton onClick={handleOpenProfile} sx={{ p: 0.5 }}>
 						<Avatar sx={{ width: 32, height: 32, bgcolor: "primary.main" }}>
@@ -197,7 +191,7 @@ export default function GhostHeader({
 							gap: 1,
 						}}
 					>
-						{APPS.map((app) => (
+						{GHOST_APPS.map((app) => (
 							<Box
 								key={app.name}
 								component="a"

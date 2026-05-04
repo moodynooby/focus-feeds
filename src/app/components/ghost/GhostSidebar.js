@@ -1,9 +1,9 @@
 "use client";
 
-import CreateIcon from "@mui/icons-material/Create";
-import InboxIcon from "@mui/icons-material/Inbox";
-import LabelIcon from "@mui/icons-material/Label";
-import StarIcon from "@mui/icons-material/Star";
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined";
+import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
+import StarOutlinedIcon from "@mui/icons-material/StarOutlined";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Drawer from "@mui/material/Drawer";
@@ -19,34 +19,41 @@ const drawerWidth = 256;
 
 export default function GhostSidebar({
 	open,
+	onClose,
 	sources,
 	selectedSources,
 	onSourcesChange,
 	view,
 	onViewChange,
 	onAddFeed,
+	isMobile,
 }) {
 	const navItems = [
-		{ id: "inbox", label: "Inbox", icon: <InboxIcon /> },
-		{ id: "starred", label: "Starred", icon: <StarIcon /> },
+		{ id: "inbox", label: "Inbox", icon: <InboxOutlinedIcon /> },
+		{ id: "starred", label: "Starred", icon: <StarOutlinedIcon /> },
 	];
 
 	return (
 		<Drawer
-			variant="permanent"
+			variant={isMobile ? "temporary" : "permanent"}
+			open={open}
+			onClose={onClose}
 			sx={{
-				width: open ? drawerWidth : 72,
+				width: open || !isMobile ? drawerWidth : 0,
 				flexShrink: 0,
 				"& .MuiDrawer-paper": {
-					width: open ? drawerWidth : 72,
+					width: drawerWidth,
 					boxSizing: "border-box",
 					border: "none",
 					bgcolor: "background.default",
-					transition: (theme) =>
-						theme.transitions.create("width", {
-							easing: theme.transitions.easing.sharp,
-							duration: theme.transitions.duration.enteringScreen,
-						}),
+					...(!isMobile && {
+						width: open ? drawerWidth : 72,
+						transition: (theme) =>
+							theme.transitions.create("width", {
+								easing: theme.transitions.easing.sharp,
+								duration: theme.transitions.duration.enteringScreen,
+							}),
+					}),
 					overflowX: "hidden",
 				},
 			}}
@@ -55,7 +62,7 @@ export default function GhostSidebar({
 			<Box sx={{ p: 2, pb: 1 }}>
 				<Button
 					variant="contained"
-					startIcon={<CreateIcon />}
+					startIcon={<AddOutlinedIcon sx={{ fontSize: 28 }} />}
 					onClick={onAddFeed}
 					sx={{
 						height: 56,
@@ -148,7 +155,7 @@ export default function GhostSidebar({
 												color: isSelected ? "primary.main" : "text.secondary",
 											}}
 										>
-											<LabelIcon fontSize="small" />
+											<LabelOutlinedIcon fontSize="small" />
 										</ListItemIcon>
 										<ListItemText
 											primary={source}

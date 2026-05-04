@@ -1,7 +1,7 @@
 "use client";
 
-import StarIcon from "@mui/icons-material/Star";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
+import StarBorderOutlinedIcon from "@mui/icons-material/StarBorderOutlined";
+import StarOutlinedIcon from "@mui/icons-material/StarOutlined";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
@@ -21,8 +21,9 @@ export default function GhostFeedItem({
 			sx={{
 				display: "flex",
 				alignItems: "center",
-				px: 1,
-				py: 0.5,
+				px: 2,
+				py: 0.25,
+				height: 40,
 				borderBottom: "1px solid",
 				borderColor: "divider",
 				bgcolor: isSelected
@@ -51,19 +52,19 @@ export default function GhostFeedItem({
 					sx={{ p: 0.5, color: isStarred ? "#f4b400" : "text.secondary" }}
 				>
 					{isStarred ? (
-						<StarIcon fontSize="small" />
+						<StarOutlinedIcon fontSize="small" />
 					) : (
-						<StarBorderIcon fontSize="small" />
+						<StarBorderOutlinedIcon fontSize="small" />
 					)}
 				</IconButton>
 			</Box>
 
 			<Typography
 				variant="body2"
+				noWrap
 				sx={{
 					minWidth: 150,
 					fontWeight: 700,
-					noWrap: true,
 					overflow: "hidden",
 					textOverflow: "ellipsis",
 					mr: 2,
@@ -83,25 +84,14 @@ export default function GhostFeedItem({
 			>
 				<Typography
 					variant="body2"
+					noWrap
 					sx={{
-						fontWeight: 700,
-						noWrap: true,
+						fontWeight: 400,
 						overflow: "hidden",
 						textOverflow: "ellipsis",
 					}}
 				>
 					{item.title}
-				</Typography>
-				<Typography
-					variant="body2"
-					color="text.secondary"
-					sx={{
-						noWrap: true,
-						overflow: "hidden",
-						textOverflow: "ellipsis",
-					}}
-				>
-					- {item.contentSnippet || item.content?.substring(0, 100)}
 				</Typography>
 			</Box>
 

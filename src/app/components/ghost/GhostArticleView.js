@@ -1,17 +1,18 @@
 "use client";
 
-import ArchiveIcon from "@mui/icons-material/Archive";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import DeleteIcon from "@mui/icons-material/Delete";
-import MarkEmailUnreadIcon from "@mui/icons-material/MarkEmailUnread";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
+import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import MarkEmailUnreadOutlinedIcon from "@mui/icons-material/MarkEmailUnreadOutlined";
+import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
+import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import DOMPurify from "isomorphic-dompurify";
 
 export default function GhostArticleView({ item, onBack }) {
 	if (!item) return null;
@@ -30,26 +31,26 @@ export default function GhostArticleView({ item, onBack }) {
 			<Box sx={{ p: 1, display: "flex", alignItems: "center", gap: 1 }}>
 				<Tooltip title="Back to Inbox">
 					<IconButton onClick={onBack}>
-						<ArrowBackIcon />
+						<ArrowBackOutlinedIcon />
 					</IconButton>
 				</Tooltip>
 				<IconButton>
-					<ArchiveIcon fontSize="small" />
+					<ArchiveOutlinedIcon fontSize="small" />
 				</IconButton>
 				<IconButton>
-					<DeleteIcon fontSize="small" />
+					<DeleteOutlinedIcon fontSize="small" />
 				</IconButton>
 				<IconButton>
-					<MarkEmailUnreadIcon fontSize="small" />
+					<MarkEmailUnreadOutlinedIcon fontSize="small" />
 				</IconButton>
 				<Box sx={{ flex: 1 }} />
 				<Tooltip title="Open original">
 					<IconButton component="a" href={item.link} target="_blank">
-						<OpenInNewIcon fontSize="small" />
+						<OpenInNewOutlinedIcon fontSize="small" />
 					</IconButton>
 				</Tooltip>
 				<IconButton>
-					<MoreVertIcon fontSize="small" />
+					<MoreVertOutlinedIcon fontSize="small" />
 				</IconButton>
 			</Box>
 			<Divider />
@@ -92,7 +93,10 @@ export default function GhostArticleView({ item, onBack }) {
 						"& img": { maxWidth: "100%", height: "auto" },
 						"& a": { color: "primary.main" },
 					}}
-					dangerouslySetInnerHTML={{ __html: item.content }}
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: Sanitized with DOMPurify
+					dangerouslySetInnerHTML={{
+						__html: DOMPurify.sanitize(item.content),
+					}}
 				/>
 			</Box>
 		</Paper>

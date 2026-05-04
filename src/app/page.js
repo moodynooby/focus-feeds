@@ -224,8 +224,15 @@ export default function FeedManager() {
 		[items],
 	);
 
+	const [view, setView] = useState("inbox"); // inbox, starred
+
 	const filteredItems = useMemo(() => {
 		return items.filter((item) => {
+			const itemId = item.guid || item.link;
+			if (view === "starred" && !starredItems.includes(itemId)) {
+				return false;
+			}
+
 			const matchesSearch = debouncedSearchQuery
 				? (item.title || "")
 						.toLowerCase()
@@ -245,7 +252,7 @@ export default function FeedManager() {
 
 			return matchesSearch && matchesSource;
 		});
-	}, [items, debouncedSearchQuery, selectedSources]);
+	}, [items, debouncedSearchQuery, selectedSources, view, starredItems]);
 
 	const visibleItems = filteredItems.slice(0, displayLimit);
 	const hasMoreItems = filteredItems.length > displayLimit;
@@ -286,6 +293,8 @@ export default function FeedManager() {
 					status={status}
 					loading={isLoading}
 					onAddFeed={handleOpenDrawer}
+					view={view}
+					onViewChange={setView}
 				/>
 				<Tooltip title="Switch to Classic Mode">
 					<Fab
