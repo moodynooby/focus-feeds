@@ -3,7 +3,6 @@
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
 import Paper from "@mui/material/Paper";
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
@@ -25,7 +24,7 @@ export default function FeedList({
 			<Box sx={{ display: "flex", flexDirection: "column", gap: 2, p: 2 }}>
 				{Array.from({ length: 5 }).map((_, i) => (
 					<Paper
-						key={i}
+						key={`skeleton-${i}`}
 						elevation={0}
 						sx={{
 							p: 2,

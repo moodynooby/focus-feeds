@@ -1,11 +1,11 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 import Parser from "rss-parser";
 import { sql } from "@/lib/db";
 import { getCurrentUser } from "@/lib/simple-auth";
 
-export async function fetchFeeds(urls, duration = "week") {
+async function fetchFeedsInternal(urls, duration = "week") {
 	const parser = new Parser();
 
 	if (!urls || urls.length === 0) {
@@ -34,7 +34,8 @@ export async function fetchFeeds(urls, duration = "week") {
 		const allItems = [];
 		const failedFeeds = [];
 
-		results.forEach((result, index) => {
+		for (let i = 0; i < results.length; i++) {
+			const result = results[i];
 			if (result.status === "fulfilled") {
 				const feedItems = result.value.items
 					.filter((item) => {
@@ -51,7 +52,7 @@ export async function fetchFeeds(urls, duration = "week") {
 							contentSnippet: String(item.contentSnippet || ""),
 							guid: String(item.guid || ""),
 							source: String(result.value.title || "Unknown Source"),
-							feedUrl: String(urls[index]),
+							feedUrl: String(urls[i]),
 							isPodcast: Boolean(
 								item.enclosure?.url &&
 									item.enclosure?.type?.startsWith("audio/"),
@@ -69,12 +70,12 @@ export async function fetchFeeds(urls, duration = "week") {
 				allItems.push(...feedItems);
 			} else {
 				failedFeeds.push({
-					url: urls[index],
+					url: urls[i],
 					error: result.reason?.message || "Unknown error",
 				});
-				console.error(`Feed failed [${urls[index]}]:`, result.reason);
+				console.error(`Feed failed [${urls[i]}]:`, result.reason);
 			}
-		});
+		}
 
 		const sortedItems = allItems.sort(
 			(a, b) => new Date(b.pubDate) - new Date(a.pubDate),
@@ -97,6 +98,15 @@ export async function fetchFeeds(urls, duration = "week") {
 		};
 	}
 }
+
+export const fetchFeeds = unstable_cache(
+	async (urls, duration = "week") => fetchFeedsInternal(urls, duration),
+	["feeds"],
+	{
+		revalidate: 300,
+		tags: ["rss-feeds"],
+	},
+);
 
 export async function getUserFeeds() {
 	const user = await getCurrentUser();

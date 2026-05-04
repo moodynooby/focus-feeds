@@ -1,7 +1,9 @@
 "use client";
 
 import Box from "@mui/material/Box";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import useSWR from "swr";
+import { useDebounceValue, useLocalStorage } from "usehooks-ts";
 import { addUserFeed, fetchFeeds, removeUserFeed, syncFeeds } from "./actions";
 import FeedList from "./components/FeedList";
 import FilterHeader from "./components/filter-header";
@@ -34,19 +36,17 @@ function useSimpleSession() {
 	return { status };
 }
 
+const ITEMS_PER_BATCH = 20;
+
 export default function FeedManager() {
 	const { status } = useSimpleSession();
 	const [drawerOpen, setDrawerOpen] = useState(false);
-	const [urls, setUrls] = useState([]);
-	const [initLoadDone, setInitLoadDone] = useState(false);
-	const [duration, setDuration] = useState("week");
-
-	const [items, setItems] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
-	const [failedFeeds, setFailedFeeds] = useState(null);
-	const [lastRefresh, setLastRefresh] = useState(null);
 	const [deferredPrompt, setDeferredPrompt] = useState(null);
+	const [displayLimit, setDisplayLimit] = useState(ITEMS_PER_BATCH);
+
+	const [urls, setUrls] = useLocalStorage("focusFeedsUrls", []);
+	const [duration, setDuration] = useLocalStorage("focusFeedsDuration", "week");
+
 	const [syncStatus, setSyncStatus] = useState({
 		loading: false,
 		error: null,
@@ -56,8 +56,9 @@ export default function FeedManager() {
 
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedSources, setSelectedSources] = useState([]);
-	const ITEMS_PER_BATCH = 20;
-	const [displayLimit, setDisplayLimit] = useState(ITEMS_PER_BATCH);
+
+	const [debouncedSearchQuery] = useDebounceValue(searchQuery, 300);
+	const prevFiltersRef = useRef({ search: "", sources: [] });
 
 	useEffect(() => {
 		const handleBeforeInstallPrompt = (e) => {
@@ -83,178 +84,67 @@ export default function FeedManager() {
 		}
 	};
 
-	useEffect(() => {
-		if (typeof window === "undefined") return;
-
-		if (status === "loading") return;
-
-		const loadInitialData = async () => {
-			let loadedUrls = [];
-			let loadedDuration = "week";
-
-			if (status === "authenticated") {
-				const localSavedUrls = localStorage.getItem("focusFeedsUrls");
-				let localFeeds = [];
-				if (localSavedUrls) {
-					try {
-						const parsed = JSON.parse(localSavedUrls);
-						if (Array.isArray(parsed)) localFeeds = parsed;
-					} catch (_e) {}
-				}
-
-				setSyncStatus((prev) => ({ ...prev, loading: true, error: null }));
-				const result = await syncFeeds(localFeeds, { mergeStrategy: "merge" });
-
-				if (result.success) {
-					loadedUrls = result.feeds.map((f) => f.url);
-					setSyncStatus({
-						loading: false,
-						error: null,
-						lastSync: Date.now(),
-						info: result.syncInfo,
-					});
-				} else {
-					console.error("Failed to sync/load user feeds", result.error);
-					setSyncStatus({
-						loading: false,
-						error: result.error,
-						lastSync: null,
-						info: null,
-					});
-				}
-
-				const savedDuration = localStorage.getItem("focusFeedsDuration");
-				if (savedDuration) loadedDuration = savedDuration;
-			} else {
-				const savedUrls = localStorage.getItem("focusFeedsUrls");
-				if (savedUrls) {
-					try {
-						const parsed = JSON.parse(savedUrls);
-						if (Array.isArray(parsed)) {
-							loadedUrls = parsed;
-						}
-					} catch (e) {
-						console.error("Failed to parse saved feeds", e);
-					}
-				} else {
-					loadedUrls = [
-						"https://hnrss.org/frontpage",
-						"https://feeds.megaphone.fm/vergecast",
-					];
-				}
-
-				const savedDuration = localStorage.getItem("focusFeedsDuration");
-				if (savedDuration) {
-					loadedDuration = savedDuration;
-				}
-			}
-
-			setUrls(loadedUrls);
-			setDuration(loadedDuration);
-			setInitLoadDone(true);
-		};
-
-		loadInitialData();
-	}, [status]);
-
-	useEffect(() => {
-		if (initLoadDone && status === "unauthenticated") {
-			localStorage.setItem("focusFeedsUrls", JSON.stringify(urls));
-			localStorage.setItem("focusFeedsDuration", duration);
-		}
-		if (initLoadDone) {
-			localStorage.setItem("focusFeedsDuration", duration);
-		}
-	}, [urls, duration, initLoadDone, status]);
-
-	const cacheRef = useRef(new Map());
-	const CACHE_DURATION = 5 * 60 * 1000;
-	const abortControllerRef = useRef(null);
-
-	const loadFeeds = useCallback(
-		async (forceRefresh = false) => {
-			if (!initLoadDone) return;
-			if (urls.length === 0 && initLoadDone) {
-				setItems([]);
-				setLoading(false);
-				return;
-			}
-
-			if (abortControllerRef.current) {
-				abortControllerRef.current.abort();
-			}
-
-			abortControllerRef.current = new AbortController();
-
-			const cacheKey = `${urls.sort().join(",")}|${duration}`;
-			const cached = cacheRef.current.get(cacheKey);
-
-			if (
-				!forceRefresh &&
-				cached &&
-				Date.now() - cached.timestamp < CACHE_DURATION
-			) {
-				setItems(cached.items);
-				setFailedFeeds(cached.failedFeeds);
-				setLastRefresh(new Date(cached.timestamp));
-				setLoading(false);
-				return;
-			}
-
-			setLoading(true);
-			setError(null);
-			setFailedFeeds(null);
-
-			if (urls.length === 0) {
-				setItems([]);
-				setLoading(false);
-				return;
-			}
-
-			try {
-				const response = await fetchFeeds(urls, duration);
-
-				if (abortControllerRef.current?.signal.aborted) {
-					return;
-				}
-
-				if (response.success) {
-					cacheRef.current.set(cacheKey, {
-						items: response.items,
-						failedFeeds: response.failedFeeds,
-						timestamp: response.timestamp,
-					});
-
-					setItems(response.items);
-					setFailedFeeds(response.failedFeeds);
-					setLastRefresh(new Date(response.timestamp));
-				} else {
-					setError(response.error);
-					setItems([]);
-				}
-			} catch (err) {
-				if (err.name !== "AbortError") {
-					setError("Network error: Failed to connect to server");
-					console.error("Client error:", err);
-				}
-			} finally {
-				setLoading(false);
-			}
+	const { data, error, isLoading, mutate } = useSWR(
+		urls.length > 0 ? [urls, duration] : null,
+		async ([urls, duration]) => {
+			const result = await fetchFeeds(urls, duration);
+			if (!result.success)
+				throw new Error(result.error || "Failed to fetch feeds");
+			return result;
 		},
-		[urls, initLoadDone, duration],
+		{
+			refreshInterval: 5 * 60 * 1000,
+			revalidateOnFocus: true,
+			dedupingInterval: 2000,
+		},
 	);
 
-	useEffect(() => {
-		if (initLoadDone) {
-			loadFeeds();
-		}
+	const items = data?.items ?? [];
+	const failedFeeds = data?.failedFeeds ?? null;
+	const lastRefresh = data?.timestamp ? new Date(data.timestamp) : null;
 
-		return () => {
-			if (abortControllerRef.current) {
-				abortControllerRef.current.abort();
+	useEffect(() => {
+		if (status !== "loading" && urls.length === 0 && !syncStatus.lastSync) {
+			setUrls([
+				"https://hnrss.org/frontpage",
+				"https://feeds.megaphone.fm/vergecast",
+			]);
+		}
+	}, [status, urls.length, syncStatus.lastSync, setUrls]);
+
+	const hasSyncedRef = useRef(false);
+	useEffect(() => {
+		if (status !== "authenticated" || hasSyncedRef.current) return;
+		hasSyncedRef.current = true;
+
+		const syncUserFeeds = async () => {
+			setSyncStatus((prev) => ({ ...prev, loading: true, error: null }));
+			const result = await syncFeeds(urls, { mergeStrategy: "merge" });
+
+			if (result.success) {
+				const serverUrls = result.feeds.map((f) => f.url);
+				if (JSON.stringify(serverUrls) !== JSON.stringify(urls)) {
+					setUrls(serverUrls);
+				}
+				setSyncStatus({
+					loading: false,
+					error: null,
+					lastSync: Date.now(),
+					info: result.syncInfo,
+				});
+			} else {
+				console.error("Failed to sync feeds:", result.error);
+				setSyncStatus({
+					loading: false,
+					error: result.error,
+					lastSync: null,
+					info: null,
+				});
 			}
 		};
-	}, [loadFeeds, initLoadDone]);
+
+		syncUserFeeds();
+	}, [status, urls, setUrls]);
 
 	const handleRemove = async (urlToRemove) => {
 		setUrls((prev) => prev.filter((url) => url !== urlToRemove));
@@ -306,41 +196,61 @@ export default function FeedManager() {
 	};
 
 	const clearCache = () => {
-		cacheRef.current.clear();
-		loadFeeds(true);
+		mutate(undefined, { revalidate: true });
 	};
 
 	const handleLoadMore = () => {
 		setDisplayLimit((prev) => prev + ITEMS_PER_BATCH);
 	};
 
-	const sources = [
-		...new Set(items.map((item) => item.feedTitle || item.source || "Unknown")),
-	].sort();
+	const sources = useMemo(
+		() =>
+			[
+				...new Set(
+					items.map((item) => item.feedTitle || item.source || "Unknown"),
+				),
+			].sort(),
+		[items],
+	);
 
-	const filteredItems = items.filter((item) => {
-		const matchesSearch = searchQuery
-			? (item.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-				(item.contentSnippet || "")
-					.toLowerCase()
-					.includes(searchQuery.toLowerCase()) ||
-				(item.content || "").toLowerCase().includes(searchQuery.toLowerCase())
-			: true;
-
-		const matchesSource =
-			selectedSources.length > 0
-				? selectedSources.includes(item.feedTitle || item.source || "Unknown")
+	const filteredItems = useMemo(() => {
+		return items.filter((item) => {
+			const matchesSearch = debouncedSearchQuery
+				? (item.title || "")
+						.toLowerCase()
+						.includes(debouncedSearchQuery.toLowerCase()) ||
+					(item.contentSnippet || "")
+						.toLowerCase()
+						.includes(debouncedSearchQuery.toLowerCase()) ||
+					(item.content || "")
+						.toLowerCase()
+						.includes(debouncedSearchQuery.toLowerCase())
 				: true;
 
-		return matchesSearch && matchesSource;
-	});
+			const matchesSource =
+				selectedSources.length > 0
+					? selectedSources.includes(item.feedTitle || item.source || "Unknown")
+					: true;
+
+			return matchesSearch && matchesSource;
+		});
+	}, [items, debouncedSearchQuery, selectedSources]);
 
 	const visibleItems = filteredItems.slice(0, displayLimit);
 	const hasMoreItems = filteredItems.length > displayLimit;
 
 	useEffect(() => {
-		setDisplayLimit(ITEMS_PER_BATCH);
-	}, [searchQuery, selectedSources, ITEMS_PER_BATCH]);
+		const prev = prevFiltersRef.current;
+		const currSearch = debouncedSearchQuery;
+		const currSources = selectedSources;
+		if (
+			prev.search !== currSearch ||
+			prev.sources.join() !== currSources.join()
+		) {
+			setDisplayLimit(20);
+			prevFiltersRef.current = { search: currSearch, sources: currSources };
+		}
+	}, [debouncedSearchQuery, selectedSources]);
 
 	return (
 		<>
@@ -350,21 +260,21 @@ export default function FeedManager() {
 				sources={sources}
 				selectedSources={selectedSources}
 				onSourcesChange={setSelectedSources}
-				onRefresh={() => loadFeeds(true)}
+				onRefresh={() => mutate(undefined, { revalidate: true })}
 				onOpenSettings={handleOpenDrawer}
 				onClearFilters={handleClearFilters}
 				filteredCount={filteredItems.length}
 				totalCount={items.length}
-				loading={loading}
+				loading={isLoading}
 			/>
 
 			<Box sx={{ maxWidth: "800px", mx: "auto", pb: 4, pt: 2 }}>
 				<FeedList
-					loading={loading}
+					loading={isLoading}
 					error={error}
 					failedFeeds={failedFeeds}
 					items={visibleItems}
-					onRefresh={() => loadFeeds(true)}
+					onRefresh={() => mutate(undefined, { revalidate: true })}
 					hasMoreItems={hasMoreItems}
 					onLoadMore={handleLoadMore}
 					totalCount={filteredItems.length}
@@ -378,7 +288,7 @@ export default function FeedManager() {
 					onRemove={handleRemove}
 					itemsCount={items.length}
 					lastRefresh={lastRefresh}
-					onRefresh={() => loadFeeds(true)}
+					onRefresh={() => mutate(undefined, { revalidate: true })}
 					onClearCache={clearCache}
 					duration={duration}
 					onDurationChange={setDuration}
