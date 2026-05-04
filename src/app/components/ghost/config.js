@@ -1,15 +1,3 @@
 export const GHOST_APPS = [
-	{ name: "Jmail", url: "https://jmail.world/", icon: "📧" },
-	{ name: "JPhotos", url: "https://jmail.world/photos", icon: "🖼️" },
-	{ name: "JDrive", url: "https://jmail.world/drive/new-only", icon: "📁" },
-	{ name: "JCal", url: "https://jmail.world/calendar", icon: "📅" },
-	{ name: "JFlights", url: "https://jmail.world/flights", icon: "✈️" },
-	{ name: "JVR", url: "https://jmail.world/vr", icon: "🥽" },
-	{ name: "Jamazon", url: "https://jmail.world/jamazon", icon: "📦" },
-	{ name: "Jemini", url: "https://jmail.world/jemini", icon: "💎" },
-	{ name: "Jotify", url: "https://jmail.world/jotify", icon: "🎵" },
-	{ name: "JMessage", url: "https://jmail.world/messages", icon: "💬" },
-	{ name: "Jacebook", url: "https://jmail.world/jacebook", icon: "👤" },
-	{ name: "JeffTube", url: "https://jmail.world/jefftube", icon: "📺" },
-	{ name: "Jwiki", url: "https://jmail.world/wiki", icon: "📖" },
+	{ name: "Fmail", url: "https://f-f2.netlify.app//", icon: "📧" },
 ];
