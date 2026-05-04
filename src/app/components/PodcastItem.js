@@ -103,7 +103,7 @@ export default function PodcastItem({ item }) {
 						color: "text.secondary",
 					}}
 				>
-					{new Date(item.pubDate).toLocaleDateString()}
+					{new Date(item.pubDate).toISOString().split("T")[0]}
 				</Box>
 			</Box>
 

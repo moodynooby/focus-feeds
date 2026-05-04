@@ -62,10 +62,12 @@ export default function SettingsDrawer({
 			anchor="right"
 			open={open}
 			onClose={onClose}
-			PaperProps={{
-				sx: {
-					width: { xs: "100%", sm: "480px" },
-					bgcolor: "background.default",
+			slotProps={{
+				paper: {
+					sx: {
+						width: { xs: "100%", sm: "480px" },
+						bgcolor: "background.default",
+					},
 				},
 			}}
 		>

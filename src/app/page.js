@@ -271,7 +271,7 @@ export default function FeedManager() {
 			<Box sx={{ maxWidth: "800px", mx: "auto", pb: 4, pt: 2 }}>
 				<FeedList
 					loading={isLoading}
-					error={error}
+					error={error?.message}
 					failedFeeds={failedFeeds}
 					items={visibleItems}
 					onRefresh={() => mutate(undefined, { revalidate: true })}

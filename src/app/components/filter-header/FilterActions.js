@@ -31,21 +31,23 @@ export default function FilterActions({
 				</Tooltip>
 			)}
 			<Tooltip title={loading ? "Loading..." : "Refresh feeds"}>
-				<IconButton
-					onClick={onRefresh}
-					size="small"
-					disabled={loading}
-					sx={{
-						color: "text.secondary",
-						animation: loading ? "spin 1s linear infinite" : "none",
-						"@keyframes spin": {
-							from: { transform: "rotate(0deg)" },
-							to: { transform: "rotate(360deg)" },
-						},
-					}}
-				>
-					<RefreshIcon fontSize="small" />
-				</IconButton>
+				<span>
+					<IconButton
+						onClick={onRefresh}
+						size="small"
+						disabled={loading}
+						sx={{
+							color: "text.secondary",
+							animation: loading ? "spin 1s linear infinite" : "none",
+							"@keyframes spin": {
+								from: { transform: "rotate(0deg)" },
+								to: { transform: "rotate(360deg)" },
+							},
+						}}
+					>
+						<RefreshIcon fontSize="small" />
+					</IconButton>
+				</span>
 			</Tooltip>
 			<Tooltip title="Settings">
 				<IconButton

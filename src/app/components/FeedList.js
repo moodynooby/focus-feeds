@@ -21,7 +21,10 @@ export default function FeedList({
 }) {
 	if (loading && items.length === 0) {
 		return (
-			<Box sx={{ display: "flex", flexDirection: "column", gap: 2, p: 2 }}>
+			<Box
+				sx={{ display: "flex", flexDirection: "column", gap: 2, p: 2 }}
+				suppressHydrationWarning
+			>
 				{Array.from({ length: 5 }).map((_, i) => (
 					<Paper
 						key={`skeleton-${i}`}
