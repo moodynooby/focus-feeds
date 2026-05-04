@@ -1,8 +1,8 @@
 "use client";
 
-import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
+import Image from "next/image";
 import { getHostname } from "./utils";
 
 export default function FeedItem({ item }) {
@@ -34,10 +34,13 @@ export default function FeedItem({ item }) {
 					mb: 1.5,
 				}}
 			>
-				<Avatar
-					variant="rounded"
-					src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=32`}
-					sx={{ width: 20, height: 20, bgcolor: "transparent" }}
+				<Image
+					src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`}
+					alt={item.source}
+					width={20}
+					height={20}
+					style={{ borderRadius: 4 }}
+					unoptimized={false}
 				/>
 				<Box
 					component="span"

@@ -14,6 +14,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import DOMPurify from "isomorphic-dompurify";
 import PodcastPlayer from "../PodcastPlayer";
+import RSSContent from "../RSSContent";
 
 export default function GhostArticleView({ item, onBack }) {
 	if (!item) return null;
@@ -88,17 +89,12 @@ export default function GhostArticleView({ item, onBack }) {
 						</Typography>
 					</Box>
 				</Box>
-				<Box
+				<RSSContent
+					content={DOMPurify.sanitize(item.content)}
 					sx={{
 						lineHeight: 1.6,
 						fontSize: "1rem",
 						color: "text.primary",
-						"& img": {
-							maxWidth: "100%",
-							height: "auto",
-							borderRadius: 1,
-							my: 2,
-						},
 						"& a": { color: "primary.main", textDecoration: "none" },
 						"& a:hover": { textDecoration: "underline" },
 						"& p": { mb: 2 },
@@ -122,10 +118,6 @@ export default function GhostArticleView({ item, onBack }) {
 							fontSize: "0.9rem",
 							my: 2,
 						},
-					}}
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: Sanitized with DOMPurify
-					dangerouslySetInnerHTML={{
-						__html: DOMPurify.sanitize(item.content),
 					}}
 				/>
 				{item.isPodcast && (
