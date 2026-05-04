@@ -11,10 +11,10 @@
 
 ## Architecture and Structure
 
-- **Framework**: Next.js 16.1.1 with React 19.2.3
-- **UI Library**: Material UI (MUI) v7
-- **Styling**: Tailwind CSS v4 + Emotion + MUI
-- **RSS Parsing**: rss-parser v3.13.0
+- **Framework**: Next.js and React
+- **UI Library**: Material UI (MUI)
+- **Styling**: Tailwind CSS  + Emotion + MUI
+- **RSS Parsing**: rss-parser 
 - **App Structure**: 
   - `/src/app/` - App Router (pages, layouts, server actions)
   - `/src/app/components/` - React components
@@ -30,4 +30,3 @@
 - **Import Organization**: Biome auto-organizes imports
 - **Naming**: camelCase for variables/functions, PascalCase for components
 - **Module System**: ESM only (`.mjs` configs, `import`/`export`)
-- **Cache**: RSS feeds cached 5 minutes; use server actions for data fetching

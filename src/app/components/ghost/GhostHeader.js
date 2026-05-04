@@ -174,13 +174,15 @@ export default function GhostHeader({
 					anchorEl={anchorElApps}
 					open={Boolean(anchorElApps)}
 					onClose={handleCloseApps}
-					PaperProps={{
-						sx: {
-							mt: 1.5,
-							width: 320,
-							p: 2,
-							borderRadius: 4,
-							bgcolor: "background.paper",
+					slotProps={{
+						paper: {
+							sx: {
+								mt: 1.5,
+								width: 320,
+								p: 2,
+								borderRadius: 4,
+								bgcolor: "background.paper",
+							},
 						},
 					}}
 				>
