@@ -1,5 +1,7 @@
 "use client";
 
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import { Fab, Tooltip } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useEffect, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
@@ -7,6 +9,7 @@ import { useDebounceValue, useLocalStorage } from "usehooks-ts";
 import { addUserFeed, fetchFeeds, removeUserFeed, syncFeeds } from "./actions";
 import FeedList from "./components/FeedList";
 import FilterHeader from "./components/filter-header";
+import GhostLayout from "./components/ghost/GhostLayout";
 import SettingsDrawer from "./components/SettingsDrawer";
 
 function useSimpleSession() {
@@ -46,6 +49,14 @@ export default function FeedManager() {
 
 	const [urls, setUrls] = useLocalStorage("focusFeedsUrls", []);
 	const [duration, setDuration] = useLocalStorage("focusFeedsDuration", "week");
+	const [isGhostMode, setIsGhostMode] = useLocalStorage(
+		"focusFeedsGhostMode",
+		false,
+	);
+	const [starredItems, setStarredItems] = useLocalStorage(
+		"focusFeedsStarredItems",
+		[],
+	);
 
 	const [syncStatus, setSyncStatus] = useState({
 		loading: false,
@@ -252,8 +263,74 @@ export default function FeedManager() {
 		}
 	}, [debouncedSearchQuery, selectedSources]);
 
+	const toggleStar = (id) => {
+		setStarredItems((prev) =>
+			prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
+		);
+	};
+
+	if (isGhostMode) {
+		return (
+			<>
+				<GhostLayout
+					searchQuery={searchQuery}
+					onSearchChange={setSearchQuery}
+					sources={sources}
+					selectedSources={selectedSources}
+					onSourcesChange={setSelectedSources}
+					items={filteredItems}
+					starredItems={starredItems}
+					onToggleStar={toggleStar}
+					onOpenSettings={handleOpenDrawer}
+					onSignOut={handleSignOut}
+					status={status}
+					loading={isLoading}
+					onAddFeed={handleOpenDrawer}
+				/>
+				<Tooltip title="Switch to Classic Mode">
+					<Fab
+						color="primary"
+						aria-label="classic-mode"
+						onClick={() => setIsGhostMode(false)}
+						sx={{ position: "fixed", bottom: 16, right: 16 }}
+					>
+						<AutoFixHighIcon />
+					</Fab>
+				</Tooltip>
+				<SettingsDrawer
+					open={drawerOpen}
+					onClose={handleCloseDrawer}
+					urls={urls}
+					onAdd={handleAdd}
+					onRemove={handleRemove}
+					itemsCount={items.length}
+					lastRefresh={lastRefresh}
+					onRefresh={() => mutate(undefined, { revalidate: true })}
+					onClearCache={clearCache}
+					duration={duration}
+					onDurationChange={setDuration}
+					syncStatus={syncStatus}
+					status={status}
+					onSignOut={handleSignOut}
+					deferredPrompt={deferredPrompt}
+					onInstall={handleInstallClick}
+				/>
+			</>
+		);
+	}
+
 	return (
 		<>
+			<Tooltip title="Switch to Ghost Mode">
+				<Fab
+					color="primary"
+					aria-label="ghost-mode"
+					onClick={() => setIsGhostMode(true)}
+					sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 2000 }}
+				>
+					<AutoFixHighIcon />
+				</Fab>
+			</Tooltip>
 			<FilterHeader
 				searchQuery={searchQuery}
 				onSearchChange={setSearchQuery}
