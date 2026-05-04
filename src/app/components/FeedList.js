@@ -25,9 +25,12 @@ export default function FeedList({
 				sx={{ display: "flex", flexDirection: "column", gap: 2, p: 2 }}
 				suppressHydrationWarning
 			>
-				{Array.from({ length: 5 }).map((_, i) => (
+				{[...Array(5)].map((_, i) => (
 					<Paper
-						key={`skeleton-${i}`}
+						key={`skeleton-${
+							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton items have no unique id
+							i
+						}`}
 						elevation={0}
 						sx={{
 							p: 2,
