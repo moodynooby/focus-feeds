@@ -64,9 +64,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 	},
 }));
 
-import { GHOST_APPS } from "./config";
+import { GMAIL_APPS } from "./config";
 
-export default function GhostHeader({
+export default function GmailHeader({
 	searchQuery,
 	onSearchChange,
 	onToggleSidebar,
@@ -130,7 +130,7 @@ export default function GhostHeader({
 						<SearchOutlinedIcon />
 					</SearchIconWrapper>
 					<StyledInputBase
-						placeholder="Search mail"
+						placeholder="Search feeds"
 						value={searchQuery}
 						onChange={(e) => onSearchChange(e.target.value)}
 						inputProps={{ "aria-label": "search" }}
@@ -169,7 +169,6 @@ export default function GhostHeader({
 					</IconButton>
 				</Box>
 
-				{/* Apps Menu */}
 				<Menu
 					anchorEl={anchorElApps}
 					open={Boolean(anchorElApps)}
@@ -191,7 +190,7 @@ export default function GhostHeader({
 							gap: 1,
 						}}
 					>
-						{GHOST_APPS.map((app) => (
+						{GMAIL_APPS.map((app) => (
 							<Box
 								key={app.name}
 								component="a"
@@ -218,7 +217,6 @@ export default function GhostHeader({
 					</Box>
 				</Menu>
 
-				{/* Profile Menu */}
 				<Menu
 					anchorEl={anchorElProfile}
 					open={Boolean(anchorElProfile)}

@@ -1,6 +1,6 @@
 import { createTheme } from "@mui/material/styles";
 
-const getGhostDesignTokens = (mode) => ({
+const getGmailDesignTokens = (mode) => ({
 	palette: {
 		mode,
 		primary: {
@@ -65,4 +65,4 @@ const getGhostDesignTokens = (mode) => ({
 	},
 });
 
-export const ghostTheme = (mode) => createTheme(getGhostDesignTokens(mode));
+export const gmailTheme = (mode) => createTheme(getGmailDesignTokens(mode));

@@ -1,16 +1,16 @@
 "use client";
 
-import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import { Fab, Tooltip } from "@mui/material";
-import Box from "@mui/material/Box";
+import { ThemeProvider, useTheme } from "@mui/material/styles";
 import { useEffect, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
 import { useDebounceValue, useLocalStorage } from "usehooks-ts";
 import { addUserFeed, fetchFeeds, removeUserFeed, syncFeeds } from "./actions";
-import FeedList from "./components/FeedList";
-import FilterHeader from "./components/filter-header";
-import GhostLayout from "./components/ghost/GhostLayout";
+import ClassicLayout from "./components/ClassicLayout";
+import GmailLayout from "./components/gmail/GmailLayout";
 import SettingsDrawer from "./components/SettingsDrawer";
+import { gmailTheme } from "./gmail-theme";
+import { MODE_CONFIG } from "./modes";
 
 function useSimpleSession() {
 	const [status, setStatus] = useState("loading");
@@ -49,10 +49,16 @@ export default function FeedManager() {
 
 	const [urls, setUrls] = useLocalStorage("focusFeedsUrls", []);
 	const [duration, setDuration] = useLocalStorage("focusFeedsDuration", "week");
-	const [isGhostMode, setIsGhostMode] = useLocalStorage(
-		"focusFeedsGhostMode",
-		false,
-	);
+	const [mode, setMode] = useLocalStorage("focusFeedsMode", "classic");
+
+	// Migrate old localStorage key
+	useEffect(() => {
+		const oldVal = localStorage.getItem("focusFeedsGhostMode");
+		if (oldVal !== null) {
+			setMode(oldVal === "true" ? "gmail" : "classic");
+			localStorage.removeItem("focusFeedsGhostMode");
+		}
+	}, [setMode]);
 	const [starredItems, setStarredItems] = useLocalStorage(
 		"focusFeedsStarredItems",
 		[],
@@ -276,10 +282,17 @@ export default function FeedManager() {
 		);
 	};
 
-	if (isGhostMode) {
-		return (
-			<>
-				<GhostLayout
+	const appTheme = useTheme();
+	const currentMode = MODE_CONFIG[mode] || MODE_CONFIG.classic;
+	const nextMode = currentMode.nextMode;
+	const nextConfig = MODE_CONFIG[nextMode];
+
+	const refresh = () => mutate(undefined, { revalidate: true });
+
+	const content =
+		mode === "gmail" ? (
+			<ThemeProvider theme={gmailTheme(appTheme.palette.mode)}>
+				<GmailLayout
 					searchQuery={searchQuery}
 					onSearchChange={setSearchQuery}
 					sources={sources}
@@ -295,96 +308,63 @@ export default function FeedManager() {
 					onAddFeed={handleOpenDrawer}
 					view={view}
 					onViewChange={setView}
+					onRefresh={refresh}
 				/>
-				<Tooltip title="Switch to Classic Mode">
-					<Fab
-						color="primary"
-						aria-label="classic-mode"
-						onClick={() => setIsGhostMode(false)}
-						sx={{ position: "fixed", bottom: 16, right: 16 }}
-					>
-						<AutoFixHighIcon />
-					</Fab>
-				</Tooltip>
-				<SettingsDrawer
-					open={drawerOpen}
-					onClose={handleCloseDrawer}
-					urls={urls}
-					onAdd={handleAdd}
-					onRemove={handleRemove}
-					itemsCount={items.length}
-					lastRefresh={lastRefresh}
-					onRefresh={() => mutate(undefined, { revalidate: true })}
-					onClearCache={clearCache}
-					duration={duration}
-					onDurationChange={setDuration}
-					syncStatus={syncStatus}
-					status={status}
-					onSignOut={handleSignOut}
-					deferredPrompt={deferredPrompt}
-					onInstall={handleInstallClick}
-				/>
-			</>
-		);
-	}
-
-	return (
-		<>
-			<Tooltip title="Switch to Ghost Mode">
-				<Fab
-					color="primary"
-					aria-label="ghost-mode"
-					onClick={() => setIsGhostMode(true)}
-					sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 2000 }}
-				>
-					<AutoFixHighIcon />
-				</Fab>
-			</Tooltip>
-			<FilterHeader
+			</ThemeProvider>
+		) : (
+			<ClassicLayout
 				searchQuery={searchQuery}
 				onSearchChange={setSearchQuery}
 				sources={sources}
 				selectedSources={selectedSources}
 				onSourcesChange={setSelectedSources}
-				onRefresh={() => mutate(undefined, { revalidate: true })}
+				items={visibleItems}
+				loading={isLoading}
+				onRefresh={refresh}
 				onOpenSettings={handleOpenDrawer}
 				onClearFilters={handleClearFilters}
 				filteredCount={filteredItems.length}
 				totalCount={items.length}
-				loading={isLoading}
+				error={error?.message}
+				failedFeeds={failedFeeds}
+				hasMoreItems={hasMoreItems}
+				onLoadMore={handleLoadMore}
 			/>
+		);
 
-			<Box sx={{ maxWidth: "800px", mx: "auto", pb: 4, pt: 2 }}>
-				<FeedList
-					loading={isLoading}
-					error={error?.message}
-					failedFeeds={failedFeeds}
-					items={visibleItems}
-					onRefresh={() => mutate(undefined, { revalidate: true })}
-					hasMoreItems={hasMoreItems}
-					onLoadMore={handleLoadMore}
-					totalCount={filteredItems.length}
-				/>
+	return (
+		<>
+			{content}
 
-				<SettingsDrawer
-					open={drawerOpen}
-					onClose={handleCloseDrawer}
-					urls={urls}
-					onAdd={handleAdd}
-					onRemove={handleRemove}
-					itemsCount={items.length}
-					lastRefresh={lastRefresh}
-					onRefresh={() => mutate(undefined, { revalidate: true })}
-					onClearCache={clearCache}
-					duration={duration}
-					onDurationChange={setDuration}
-					syncStatus={syncStatus}
-					status={status}
-					onSignOut={handleSignOut}
-					deferredPrompt={deferredPrompt}
-					onInstall={handleInstallClick}
-				/>
-			</Box>
+			<Tooltip title={nextConfig.fabTooltip}>
+				<Fab
+					color="primary"
+					aria-label={nextConfig.fabAriaLabel}
+					onClick={() => setMode(nextMode)}
+					sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 2000 }}
+				>
+					<nextConfig.icon />
+				</Fab>
+			</Tooltip>
+
+			<SettingsDrawer
+				open={drawerOpen}
+				onClose={handleCloseDrawer}
+				urls={urls}
+				onAdd={handleAdd}
+				onRemove={handleRemove}
+				itemsCount={items.length}
+				lastRefresh={lastRefresh}
+				onRefresh={refresh}
+				onClearCache={clearCache}
+				duration={duration}
+				onDurationChange={setDuration}
+				syncStatus={syncStatus}
+				status={status}
+				onSignOut={handleSignOut}
+				deferredPrompt={deferredPrompt}
+				onInstall={handleInstallClick}
+			/>
 		</>
 	);
 }

@@ -7,7 +7,6 @@ import Paper from "@mui/material/Paper";
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import FeedItem from "./FeedItem";
-import PodcastItem from "./PodcastItem";
 
 export default function FeedList({
 	loading,
@@ -108,13 +107,9 @@ export default function FeedList({
 				</Alert>
 			)}
 
-			{items.map((item) =>
-				item.isPodcast ? (
-					<PodcastItem key={item.guid || item.link} item={item} />
-				) : (
-					<FeedItem key={item.guid || item.link} item={item} />
-				),
-			)}
+			{items.map((item) => (
+				<FeedItem key={item.guid || item.link} item={item} />
+			))}
 
 			{hasMoreItems && (
 				<Box sx={{ mt: 3, textAlign: "center" }}>

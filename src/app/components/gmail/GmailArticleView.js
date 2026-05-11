@@ -15,8 +15,9 @@ import Typography from "@mui/material/Typography";
 import DOMPurify from "isomorphic-dompurify";
 import PodcastPlayer from "../PodcastPlayer";
 import RSSContent from "../RSSContent";
+import { formatDate } from "../utils";
 
-export default function GhostArticleView({ item, onBack }) {
+export default function GmailArticleView({ item, onBack }) {
 	if (!item) return null;
 
 	return (
@@ -85,7 +86,7 @@ export default function GhostArticleView({ item, onBack }) {
 					</Box>
 					<Box sx={{ ml: "auto", textAlign: "right" }}>
 						<Typography variant="caption" color="text.secondary">
-							{new Date(item.pubDate).toLocaleString()}
+							{formatDate(item.pubDate, "long")}
 						</Typography>
 					</Box>
 				</Box>

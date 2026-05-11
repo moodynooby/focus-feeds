@@ -14,10 +14,11 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import { toggleListItem } from "../utils";
 
 const drawerWidth = 256;
 
-export default function GhostSidebar({
+export default function GmailSidebar({
 	open,
 	onClose,
 	sources,
@@ -132,15 +133,9 @@ export default function GhostSidebar({
 								<ListItem key={source} disablePadding sx={{ display: "block" }}>
 									<ListItemButton
 										selected={isSelected}
-										onClick={() => {
-											if (isSelected) {
-												onSourcesChange(
-													selectedSources.filter((s) => s !== source),
-												);
-											} else {
-												onSourcesChange([...selectedSources, source]);
-											}
-										}}
+										onClick={() =>
+											onSourcesChange(toggleListItem(selectedSources, source))
+										}
 										sx={{
 											minHeight: 32,
 											justifyContent: "initial",

@@ -6,15 +6,14 @@ import StarOutlinedIcon from "@mui/icons-material/StarOutlined";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
-import { alpha } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import { formatDate } from "../utils";
 
-export default function GhostFeedItem({
+export default function GmailFeedItem({
 	item,
 	isStarred,
 	onToggleStar,
 	onClick,
-	isSelected,
 }) {
 	return (
 		<Box
@@ -27,9 +26,7 @@ export default function GhostFeedItem({
 				height: 40,
 				borderBottom: "1px solid",
 				borderColor: "divider",
-				bgcolor: isSelected
-					? (theme) => alpha(theme.palette.primary.main, 0.1)
-					: "background.paper",
+				bgcolor: "background.paper",
 				cursor: "pointer",
 				"&:hover": {
 					boxShadow:
@@ -111,10 +108,7 @@ export default function GhostFeedItem({
 				variant="caption"
 				sx={{ minWidth: 60, textAlign: "right", fontWeight: 700, ml: 2 }}
 			>
-				{new Date(item.pubDate).toLocaleDateString([], {
-					month: "short",
-					day: "numeric",
-				})}
+				{formatDate(item.pubDate, "short")}
 			</Typography>
 		</Box>
 	);

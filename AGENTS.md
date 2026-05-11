@@ -15,7 +15,7 @@
 - **UI Library**: Material UI (MUI) v7
 - **Styling**: Tailwind CSS v4 + Emotion + MUI
 - **RSS Parsing**: rss-parser v3.13.0
-- **App Structure**: 
+- **App Structure**:
   - `/src/app/` - App Router (pages, layouts, server actions)
   - `/src/app/components/` - React components
   - `/src/app/actions.js` - Server actions for RSS fetching
