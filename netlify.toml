@@ -1,5 +1,0 @@
-
-[dev]
-  command = "next dev"
-  framework = "next"
-  auto_launch = true

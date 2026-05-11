@@ -2,7 +2,7 @@
 
 ## Build and Development Commands
 
-- **Development**: `pnpm dev` or `npm run dev` - Starts Next.js dev server on port 3000
+- **Development**: `pnpm dev` or `npm run dev` - Starts Next.js dev server on port 3000 (uses `next dev`)
 - **Build**: `pnpm run build` or `npm run build` - Builds for production
 - **Production start**: `pnpm start` or `npm start` - Runs production server
 - **Lint**: `pnpm run lint` or `npm run lint` - Runs Biome linter

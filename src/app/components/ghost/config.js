@@ -1,3 +1,3 @@
 export const GHOST_APPS = [
-	{ name: "Fmail", url: "https://f-f2.netlify.app//", icon: "📧" },
+	{ name: "Fmail", url: "https://focus-feeds.vercel.app/", icon: "📧" },
 ];

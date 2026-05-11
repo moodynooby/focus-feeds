@@ -4,7 +4,7 @@ Focus Feeds is a simple, minimalist RSS feed reader built with Next.js and Mater
 
 ## Links
 
-- [Website](https://f-f2.netlify.app/)
+- [Website](https://focus-feeds.vercel.app/)
 - [GitHub](https://github.com/moodynooby/focus-feeds)
 
 ## Features
@@ -17,32 +17,39 @@ Focus Feeds is a simple, minimalist RSS feed reader built with Next.js and Mater
 - **Favicon Support:** Displays favicons for each feed source for easy identification.
 
 ## Demo / Screenshots
+
 TBD
 
 ## Setup
 
-1.  **Clone the repository:**
+1. **Clone the repository:**
+
     ```bash
     git clone https://github.com/moodynooby/focus-feeds.git
     ```
-2.  **Install dependencies:**
+
+2. **Install dependencies:**
+
     ```bash
     cd focus-feeds
     pnpm install
     ```
-3.  **Run the development server:**
+
+3. **Run the development server:**
+
     ```bash
     pnpm dev
     ```
+
     Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ## Release Notes
 
 ### v0.1.0 (Initial Release)
 
--   Combine multiple RSS feeds into a single stream.
--   Add and remove feed URLs.
--   Manual refresh and caching of feeds.
+- Combine multiple RSS feeds into a single stream.
+- Add and remove feed URLs.
+- Manual refresh and caching of feeds.
 
 ## License
 
