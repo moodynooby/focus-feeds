@@ -1,33 +1,29 @@
-# AGENTS.md
+<!-- BEGIN:nextjs-agent-rules -->
 
-## Build and Development Commands
+# Next.js: ALWAYS read docs before coding
 
-- **Development**: `pnpm dev` or `npm run dev` - Starts Next.js dev server on port 3000 (uses `next dev`)
-- **Build**: `pnpm run build` or `npm run build` - Builds for production
-- **Production start**: `pnpm start` or `npm start` - Runs production server
-- **Lint**: `pnpm run lint` or `npm run lint` - Runs Biome linter
-- **Format**: `pnpm run format` or `npm run format` - Auto-formats code with Biome
-- **Single test**: No test runner configured; use console.log() for debugging
+Before any Next.js work, find and read the relevant doc in `node_modules/next/dist/docs/`. Your training data is outdated — the docs are the source of truth.
 
-## Architecture and Structure
+<!-- END:nextjs-agent-rules -->
 
-- **Framework**: Next.js 16.1.1 with React 19.2.3
-- **UI Library**: Material UI (MUI) v7
-- **Styling**: Tailwind CSS v4 + Emotion + MUI
-- **RSS Parsing**: rss-parser v3.13.0
-- **App Structure**:
-  - `/src/app/` - App Router (pages, layouts, server actions)
-  - `/src/app/components/` - React components
-  - `/src/app/actions.js` - Server actions for RSS fetching
-  - `/src/app/theme.js` - MUI theme configuration
+## Commands
 
-## Code Style and Conventions
+| Command | What it does |
+|---------|-------------|
+| `npm dev` | Dev server on port 3000 |
+| `npm build` | Production build |
+| `npm start` | Production start |
+| `npm lint` | Biome check --fix |
+| `npm format` | Biome format --write |
 
-- **Language**: JavaScript (ES modules)
-- **Formatter**: Biome 2.2.0 (2 spaces, organized imports)
-- **Linting**: Biome with React and Next.js rules enabled
-- **Path Aliases**: Use `@/*` to import from `/src/*`
-- **Import Organization**: Biome auto-organizes imports
-- **Naming**: camelCase for variables/functions, PascalCase for components
-- **Module System**: ESM only (`.mjs` configs, `import`/`export`)
-- **Cache**: RSS feeds cached 5 minutes; use server actions for data fetching
+## Key facts
+
+- **Stack**: Next.js 16.2.4, React 19.2.5, MUI v9, Tailwind CSS v4, Biome 2.4.12
+- **Language**: JavaScript (ESM, no TypeScript)
+- **Imports**: `@/*` → `src/*`
+- **Format**: tab indentation, double quotes, Biome auto-organizes imports
+- **Auth**: passphrase-based via `src/lib/simple-auth.js`; uses Neon (Postgres) — `DATABASE_URL` env var required
+- **Data**: RSS via `rss-parser`, server actions in `src/app/actions.js`, feeds cached 5 min via `unstable_cache`
+- **Client state**: `localStorage` via `usehooks-ts` + SWR; server sync via `syncFeeds` action
+- **Modes**: "classic" (default) and "gmail" — toggle via FAB
+- **PWA**: listens for `beforeinstallprompt`

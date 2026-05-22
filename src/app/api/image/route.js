@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 
-export const dynamic = "force-dynamic";
-
 const ALLOWED_IMAGE_TYPES = [
 	"image/jpeg",
 	"image/jpg",

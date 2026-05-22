@@ -1,4 +1,4 @@
-"use client";
+import { format } from "date-fns";
 
 export function getHostname(link) {
 	try {
@@ -30,11 +30,7 @@ export function formatDate(date, preset = "iso") {
 	if (!date) return "Unknown date";
 	const d = new Date(date);
 	if (Number.isNaN(d.getTime())) return "Unknown date";
-	if (preset === "short") {
-		return d.toLocaleDateString([], { month: "short", day: "numeric" });
-	}
-	if (preset === "long") {
-		return d.toLocaleString();
-	}
-	return d.toISOString().split("T")[0];
+	if (preset === "short") return format(d, "MMM d");
+	if (preset === "long") return format(d, "PPpp");
+	return format(d, "yyyy-MM-dd");
 }

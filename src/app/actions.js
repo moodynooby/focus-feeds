@@ -3,7 +3,12 @@
 import { revalidatePath, unstable_cache } from "next/cache";
 import Parser from "rss-parser";
 import { sql } from "@/lib/db";
-import { getCurrentUser } from "@/lib/simple-auth";
+import {
+	clearSession,
+	getCurrentUser,
+	getOrCreateUser,
+	setSession,
+} from "@/lib/simple-auth";
 
 async function fetchFeedsInternal(urls, duration = "week") {
 	const parser = new Parser();
@@ -280,12 +285,13 @@ export async function createOrGetUser(passphrase) {
 	}
 
 	try {
-		const { getOrCreateUser } = await import("@/lib/simple-auth");
 		const user = await getOrCreateUser(passphrase);
 
 		if (!user) {
 			return { success: false, error: "Failed to create or get user" };
 		}
+
+		await setSession(user.id);
 
 		return {
 			success: true,
@@ -297,5 +303,28 @@ export async function createOrGetUser(passphrase) {
 	} catch (error) {
 		console.error("Failed to create/get user:", error);
 		return { success: false, error: "Failed to create account" };
+	}
+}
+
+export async function checkAuth() {
+	try {
+		const user = await getCurrentUser();
+		if (user) {
+			return { authenticated: true, userId: user.id };
+		}
+		return { authenticated: false };
+	} catch (error) {
+		console.error("checkAuth error:", error);
+		return { authenticated: false };
+	}
+}
+
+export async function signOut() {
+	try {
+		await clearSession();
+		return { success: true };
+	} catch (error) {
+		console.error("signOut error:", error);
+		return { success: false, error: "Failed to sign out" };
 	}
 }

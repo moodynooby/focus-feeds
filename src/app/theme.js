@@ -3,7 +3,7 @@
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Inter } from "next/font/google";
-import { createContext, useEffect, useMemo, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 const inter = Inter({
 	weight: ["300", "400", "500", "600", "700"],
@@ -174,20 +174,17 @@ export default function ThemeRegistry({ children }) {
 		}
 	}, []);
 
-	const colorMode = useMemo(
-		() => ({
-			toggleColorMode: () => {
-				setMode((prevMode) => {
-					const newMode = prevMode === "light" ? "dark" : "light";
-					localStorage.setItem("themeMode", newMode);
-					return newMode;
-				});
-			},
-		}),
-		[],
-	);
+	const colorMode = {
+		toggleColorMode: () => {
+			setMode((prevMode) => {
+				const newMode = prevMode === "light" ? "dark" : "light";
+				localStorage.setItem("themeMode", newMode);
+				return newMode;
+			});
+		},
+	};
 
-	const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
+	const theme = createTheme(getDesignTokens(mode));
 
 	return (
 		<ColorModeContext.Provider value={colorMode}>

@@ -2,13 +2,21 @@
 
 import { Fab, Tooltip } from "@mui/material";
 import { ThemeProvider, useTheme } from "@mui/material/styles";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { useDebounceValue, useLocalStorage } from "usehooks-ts";
-import { addUserFeed, fetchFeeds, removeUserFeed, syncFeeds } from "./actions";
+import {
+	addUserFeed,
+	checkAuth,
+	fetchFeeds,
+	removeUserFeed,
+	signOut,
+	syncFeeds,
+} from "./actions";
 import ClassicLayout from "./components/ClassicLayout";
 import GmailLayout from "./components/gmail/GmailLayout";
 import SettingsDrawer from "./components/SettingsDrawer";
+import { toggleListItem } from "./components/utils";
 import { gmailTheme } from "./gmail-theme";
 import { MODE_CONFIG } from "./modes";
 
@@ -16,24 +24,9 @@ function useSimpleSession() {
 	const [status, setStatus] = useState("loading");
 
 	useEffect(() => {
-		const checkSession = async () => {
-			try {
-				const response = await fetch("/api/auth", {
-					method: "GET",
-					credentials: "include",
-				});
-				if (response.ok) {
-					const data = await response.json();
-					setStatus(data.authenticated ? "authenticated" : "unauthenticated");
-				} else {
-					setStatus("unauthenticated");
-				}
-			} catch {
-				setStatus("unauthenticated");
-			}
-		};
-
-		checkSession();
+		checkAuth().then((data) => {
+			setStatus(data.authenticated ? "authenticated" : "unauthenticated");
+		});
 	}, []);
 
 	return { status };
@@ -201,14 +194,11 @@ export default function FeedManager() {
 	};
 
 	const handleSignOut = async () => {
-		try {
-			await fetch("/api/auth", {
-				method: "DELETE",
-				credentials: "include",
-			});
+		const result = await signOut();
+		if (result.success) {
 			window.location.reload();
-		} catch (error) {
-			console.error("Failed to sign out:", error);
+		} else {
+			console.error("Failed to sign out:", result.error);
 		}
 	};
 
@@ -220,45 +210,37 @@ export default function FeedManager() {
 		setDisplayLimit((prev) => prev + ITEMS_PER_BATCH);
 	};
 
-	const sources = useMemo(
-		() =>
-			[
-				...new Set(
-					items.map((item) => item.feedTitle || item.source || "Unknown"),
-				),
-			].sort(),
-		[items],
-	);
+	const sources = [
+		...new Set(items.map((item) => item.feedTitle || item.source || "Unknown")),
+	].sort();
 
 	const [view, setView] = useState("inbox"); // inbox, starred
 
-	const filteredItems = useMemo(() => {
-		return items.filter((item) => {
-			const itemId = item.guid || item.link;
-			if (view === "starred" && !starredItems.includes(itemId)) {
-				return false;
-			}
+	const filteredItems = items.filter((item) => {
+		const itemId = item.guid || item.link;
+		if (view === "starred" && !starredItems.includes(itemId)) {
+			return false;
+		}
 
-			const matchesSearch = debouncedSearchQuery
-				? (item.title || "")
-						.toLowerCase()
-						.includes(debouncedSearchQuery.toLowerCase()) ||
-					(item.contentSnippet || "")
-						.toLowerCase()
-						.includes(debouncedSearchQuery.toLowerCase()) ||
-					(item.content || "")
-						.toLowerCase()
-						.includes(debouncedSearchQuery.toLowerCase())
+		const matchesSearch = debouncedSearchQuery
+			? (item.title || "")
+					.toLowerCase()
+					.includes(debouncedSearchQuery.toLowerCase()) ||
+				(item.contentSnippet || "")
+					.toLowerCase()
+					.includes(debouncedSearchQuery.toLowerCase()) ||
+				(item.content || "")
+					.toLowerCase()
+					.includes(debouncedSearchQuery.toLowerCase())
+			: true;
+
+		const matchesSource =
+			selectedSources.length > 0
+				? selectedSources.includes(item.feedTitle || item.source || "Unknown")
 				: true;
 
-			const matchesSource =
-				selectedSources.length > 0
-					? selectedSources.includes(item.feedTitle || item.source || "Unknown")
-					: true;
-
-			return matchesSearch && matchesSource;
-		});
-	}, [items, debouncedSearchQuery, selectedSources, view, starredItems]);
+		return matchesSearch && matchesSource;
+	});
 
 	const visibleItems = filteredItems.slice(0, displayLimit);
 	const hasMoreItems = filteredItems.length > displayLimit;
@@ -277,9 +259,7 @@ export default function FeedManager() {
 	}, [debouncedSearchQuery, selectedSources]);
 
 	const toggleStar = (id) => {
-		setStarredItems((prev) =>
-			prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
-		);
+		setStarredItems((prev) => toggleListItem(prev, id));
 	};
 
 	const appTheme = useTheme();

@@ -2,7 +2,7 @@
 
 import Box from "@mui/material/Box";
 import FeedList from "./FeedList";
-import FilterHeader from "./filter-header";
+import FilterHeader from "./filter-header/FilterHeader";
 
 export default function ClassicLayout({
 	searchQuery,

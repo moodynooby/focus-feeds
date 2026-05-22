@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
+import EmptyState from "./EmptyState";
 import FeedItem from "./FeedItem";
 
 export default function FeedList({
@@ -64,25 +65,11 @@ export default function FeedList({
 
 	if (!loading && items.length === 0 && !error) {
 		return (
-			<Box
-				sx={{
-					textAlign: "center",
-					py: 8,
-					px: 2,
-					opacity: 0.7,
-				}}
-			>
-				<Typography variant="h6" gutterBottom>
-					No articles found
-				</Typography>
-				<Typography variant="body2" sx={{ mb: 3 }}>
-					Add some feed URLs in the "Feeds Manager" tab or refresh to get
-					started.
-				</Typography>
-				<Button variant="outlined" onClick={onRefresh}>
-					Refresh Feeds
-				</Button>
-			</Box>
+			<EmptyState
+				message="No articles found. Add some feed URLs or refresh to get started."
+				actionLabel="Refresh Feeds"
+				onAction={onRefresh}
+			/>
 		);
 	}
 

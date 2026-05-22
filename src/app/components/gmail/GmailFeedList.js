@@ -5,12 +5,12 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
+import EmptyState from "../EmptyState";
 import GmailFeedItem from "./GmailFeedItem";
 
 function SkeletonRow() {
@@ -76,14 +76,11 @@ export default function GmailFeedList({
 						/>
 					))}
 				{!showSkeleton && items.length === 0 && (
-					<Box sx={{ p: 4, textAlign: "center" }}>
-						<Typography variant="body1" color="text.secondary" gutterBottom>
-							No items found.
-						</Typography>
-						<Button variant="outlined" size="small" onClick={onRefresh}>
-							Refresh
-						</Button>
-					</Box>
+					<EmptyState
+						message="No items found."
+						actionLabel="Refresh"
+						onAction={onRefresh}
+					/>
 				)}
 				{!showSkeleton &&
 					items.map((item) => (
