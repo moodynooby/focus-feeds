@@ -10,9 +10,42 @@ import {
 	setSession,
 } from "@/lib/simple-auth";
 
-async function fetchFeedsInternal(urls, duration = "week") {
-	const parser = new Parser();
+async function fetchFeedWithRetry(
+	parser,
+	url,
+	maxRetries = 3,
+	timeout = 15000,
+) {
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), timeout);
 
+	for (let attempt = 0; attempt < maxRetries; attempt++) {
+		try {
+			const result = await parser.parseURL(url);
+			clearTimeout(timeoutId);
+			return { success: true, data: result };
+		} catch (error) {
+			clearTimeout(timeoutId);
+			const isLastAttempt = attempt === maxRetries - 1;
+			const isTimeout = error.name === "AbortError";
+			const isNetworkError =
+				error.code === "ECONNABORTED" ||
+				error.code === "ECONNREFUSED" ||
+				error.message?.includes("timeout") ||
+				error.message?.includes("ECONNREFUSED");
+
+			if (isLastAttempt || (!isNetworkError && !isTimeout)) {
+				return { success: false, error, url };
+			}
+
+			const delay = Math.min(1000 * 2 ** attempt, 8000);
+			await new Promise((resolve) => setTimeout(resolve, delay));
+		}
+	}
+	return { success: false, error: new Error("Max retries exceeded"), url };
+}
+
+async function fetchFeedsInternal(urls, duration = "week") {
 	if (!urls || urls.length === 0) {
 		return {
 			success: false,
@@ -32,8 +65,9 @@ async function fetchFeedsInternal(urls, duration = "week") {
 	}
 
 	try {
+		const parser = new Parser();
 		const results = await Promise.allSettled(
-			urls.map((url) => parser.parseURL(url)),
+			urls.map((url) => fetchFeedWithRetry(parser, url)),
 		);
 
 		const allItems = [];
@@ -41,8 +75,9 @@ async function fetchFeedsInternal(urls, duration = "week") {
 
 		for (let i = 0; i < results.length; i++) {
 			const result = results[i];
-			if (result.status === "fulfilled") {
-				const feedItems = result.value.items
+			if (result.status === "fulfilled" && result.value.success) {
+				const feedData = result.value.data;
+				const feedItems = feedData.items
 					.filter((item) => {
 						if (!cutoffDate) return true;
 						const itemDate = new Date(item.pubDate);
@@ -56,7 +91,7 @@ async function fetchFeedsInternal(urls, duration = "week") {
 							content: String(item.content || item.contentSnippet || ""),
 							contentSnippet: String(item.contentSnippet || ""),
 							guid: String(item.guid || ""),
-							source: String(result.value.title || "Unknown Source"),
+							source: String(feedData.title || "Unknown Source"),
 							feedUrl: String(urls[i]),
 							isPodcast: Boolean(
 								item.enclosure?.url &&
@@ -74,11 +109,18 @@ async function fetchFeedsInternal(urls, duration = "week") {
 					});
 				allItems.push(...feedItems);
 			} else {
+				const errorMsg =
+					result.status === "fulfilled"
+						? result.value.error?.message || "Unknown error"
+						: result.reason?.message || "Unknown error";
 				failedFeeds.push({
 					url: urls[i],
-					error: result.reason?.message || "Unknown error",
+					error: errorMsg,
 				});
-				console.error(`Feed failed [${urls[i]}]:`, result.reason);
+				console.error(
+					`Feed failed [${urls[i]}]:`,
+					result.status === "fulfilled" ? result.value.error : result.reason,
+				);
 			}
 		}
 

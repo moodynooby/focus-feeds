@@ -32,12 +32,30 @@ function useSimpleSession() {
 	return { status };
 }
 
+function useServiceWorker() {
+	useEffect(() => {
+		if ("serviceWorker" in navigator) {
+			navigator.serviceWorker
+				.register("/sw.js")
+				.then((registration) => {
+					console.log("SW registered:", registration);
+				})
+				.catch((error) => {
+					console.log("SW registration failed:", error);
+				});
+		}
+	}, []);
+}
+
 const ITEMS_PER_BATCH = 20;
 
 export default function FeedManager() {
+	useServiceWorker();
 	const { status } = useSimpleSession();
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [deferredPrompt, setDeferredPrompt] = useState(null);
+	const [installStatus, setInstallStatus] = useState("available");
+	const [isOnline, setIsOnline] = useState(true); // available, installed, dismissed
 	const [displayLimit, setDisplayLimit] = useState(ITEMS_PER_BATCH);
 
 	const [urls, setUrls] = useLocalStorage("focusFeedsUrls", []);
@@ -74,14 +92,30 @@ export default function FeedManager() {
 		const handleBeforeInstallPrompt = (e) => {
 			e.preventDefault();
 			setDeferredPrompt(e);
+			setInstallStatus("available");
 		};
 
+		const handleAppInstalled = () => {
+			setInstallStatus("installed");
+			setDeferredPrompt(null);
+		};
+
+		const handleOnline = () => setIsOnline(true);
+		const handleOffline = () => setIsOnline(false);
+
 		window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+		window.addEventListener("appinstalled", handleAppInstalled);
+		window.addEventListener("online", handleOnline);
+		window.addEventListener("offline", handleOffline);
+		setIsOnline(navigator.onLine);
 		return () => {
 			window.removeEventListener(
 				"beforeinstallprompt",
 				handleBeforeInstallPrompt,
 			);
+			window.removeEventListener("appinstalled", handleAppInstalled);
+			window.removeEventListener("online", handleOnline);
+			window.removeEventListener("offline", handleOffline);
 		};
 	}, []);
 
@@ -90,7 +124,10 @@ export default function FeedManager() {
 		deferredPrompt.prompt();
 		const { outcome } = await deferredPrompt.userChoice;
 		if (outcome === "accepted") {
+			setInstallStatus("installed");
 			setDeferredPrompt(null);
+		} else {
+			setInstallStatus("dismissed");
 		}
 	};
 
@@ -289,6 +326,7 @@ export default function FeedManager() {
 					view={view}
 					onViewChange={setView}
 					onRefresh={refresh}
+					isOnline={isOnline}
 				/>
 			</ThemeProvider>
 		) : (
@@ -309,6 +347,7 @@ export default function FeedManager() {
 				failedFeeds={failedFeeds}
 				hasMoreItems={hasMoreItems}
 				onLoadMore={handleLoadMore}
+				isOnline={isOnline}
 			/>
 		);
 
@@ -344,6 +383,7 @@ export default function FeedManager() {
 				onSignOut={handleSignOut}
 				deferredPrompt={deferredPrompt}
 				onInstall={handleInstallClick}
+				installStatus={installStatus}
 			/>
 		</>
 	);

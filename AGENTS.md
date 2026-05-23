@@ -7,7 +7,7 @@ Before any Next.js work, find and read the relevant doc in `node_modules/next/di
 <!-- END:nextjs-agent-rules -->
 
 ## Commands
-
+USE PNPM FOR INSTALLING PACKAGES
 | Command | What it does |
 |---------|-------------|
 | `npm dev` | Dev server on port 3000 |
