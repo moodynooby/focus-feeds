@@ -18,10 +18,12 @@ USE PNPM FOR INSTALLING PACKAGES
 
 ## Key facts
 
-- **Stack**: Next.js 16.2.4, React 19.2.5, MUI v9, Tailwind CSS v4, Biome 2.4.12
-- **Language**: JavaScript (ESM, no TypeScript)
+- **Stack**: Next.js 16.2.6, React 19.2.5, MUI v9, Biome 2.4.12
+- **Language**: TypeScript (`.ts`/`.tsx`) + JavaScript (`.js` migration in progress)
 - **Imports**: `@/*` → `src/*`
 - **Format**: tab indentation, double quotes, Biome auto-organizes imports
+- **Hooks**: Custom logic lives in `src/hooks/` (`useAuth`, `useOnlineStatus`, `usePWAInstall`, `useStarredItems`, `useFeedFilters`, `useFeedSync`, `useServiceWorker`)
+- **Shared types**: `src/types.ts` (`FeedItem`, `AuthStatus`, `AppMode`, `SyncStatus`, etc.)
 - **Auth**: passphrase-based via `src/lib/simple-auth.js`; uses Neon (Postgres) — `DATABASE_URL` env var required
 - **Data**: RSS via `rss-parser`, server actions in `src/app/actions.js`, feeds cached 5 min via `unstable_cache`
 - **Client state**: `localStorage` via `usehooks-ts` + SWR; server sync via `syncFeeds` action
