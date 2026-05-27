@@ -18,7 +18,7 @@ import { alpha, styled, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { useContext, useState } from "react";
-import { ColorModeContext } from "../../theme";
+import { ColorModeContext } from "@/lib/theme";
 
 const Search = styled("div")(({ theme }) => ({
 	position: "relative",

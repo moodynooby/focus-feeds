@@ -20,7 +20,7 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
 import { useContext, useState } from "react";
-import { ColorModeContext } from "../theme";
+import { ColorModeContext } from "@/lib/theme";
 import SignIn from "./signIn";
 
 export default function SettingsDrawer({

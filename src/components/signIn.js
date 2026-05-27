@@ -7,7 +7,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useActionState } from "react";
-import { createOrGetUser } from "../actions";
+import { createOrGetUser } from "@/app/actions";
 
 async function signInAction(_prevState, formData) {
 	const passphrase = formData.get("passphrase");

@@ -1,12 +1,10 @@
 "use client";
 
-import WifiOffIcon from "@mui/icons-material/WifiOff";
-import Alert from "@mui/material/Alert";
-import AlertTitle from "@mui/material/AlertTitle";
 import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useState } from "react";
+import OfflineBanner from "../shared/OfflineBanner";
 import GmailArticleView from "./GmailArticleView";
 import GmailFeedList from "./GmailFeedList";
 import GmailHeader from "./GmailHeader";
@@ -38,25 +36,7 @@ export default function GmailLayout({
 
 	return (
 		<Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-			{!isOnline && (
-				<Alert
-					severity="warning"
-					icon={<WifiOffIcon />}
-					sx={{
-						position: "fixed",
-						top: 0,
-						left: 0,
-						right: 0,
-						zIndex: 2000,
-						borderRadius: 0,
-						backgroundColor:
-							theme.palette.mode === "dark" ? "#5a3d00" : "#fff3e0",
-					}}
-				>
-					<AlertTitle>Offline Mode</AlertTitle>
-					You are offline. Showing cached content.
-				</Alert>
-			)}
+			{!isOnline && <OfflineBanner variant="fixed" />}
 			<GmailHeader
 				searchQuery={searchQuery}
 				onSearchChange={onSearchChange}

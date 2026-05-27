@@ -8,32 +8,10 @@ import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import EmptyState from "../EmptyState";
+import SkeletonList from "../shared/SkeletonList";
 import GmailFeedItem from "./GmailFeedItem";
-
-function SkeletonRow() {
-	return (
-		<Box
-			sx={{
-				display: "flex",
-				alignItems: "center",
-				px: 2,
-				height: 40,
-				borderBottom: "1px solid",
-				borderColor: "divider",
-				gap: 2,
-			}}
-		>
-			<Skeleton variant="rounded" width={16} height={16} />
-			<Skeleton variant="rounded" width={16} height={16} />
-			<Skeleton variant="text" width={120} />
-			<Skeleton variant="text" sx={{ flex: 1 }} />
-			<Skeleton variant="text" width={60} />
-		</Box>
-	);
-}
 
 export default function GmailFeedList({
 	items,
@@ -68,13 +46,7 @@ export default function GmailFeedList({
 			</Box>
 			<Divider />
 			<Box sx={{ flex: 1, overflow: "auto" }}>
-				{showSkeleton &&
-					[...Array(5)].map((_, i) => (
-						<SkeletonRow
-							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton items have no unique id
-							key={i}
-						/>
-					))}
+				{showSkeleton && <SkeletonList variant="row" />}
 				{!showSkeleton && items.length === 0 && (
 					<EmptyState
 						message="No items found."

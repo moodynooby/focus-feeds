@@ -1,5 +1,5 @@
 import "./globals.css";
-import ThemeRegistry from "./theme";
+import ThemeRegistry from "@/lib/theme";
 
 export const metadata = {
 	title: "Focus Feeds",

@@ -5,6 +5,12 @@ import { ThemeProvider, useTheme } from "@mui/material/styles";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { useDebounceValue, useLocalStorage } from "usehooks-ts";
+import ClassicLayout from "@/components/ClassicLayout";
+import GmailLayout from "@/components/gmail/GmailLayout";
+import SettingsDrawer from "@/components/SettingsDrawer";
+import { toggleListItem } from "@/components/utils";
+import { gmailTheme } from "@/lib/gmail-theme";
+import { MODE_CONFIG } from "@/lib/modes";
 import {
 	addUserFeed,
 	checkAuth,
@@ -13,12 +19,6 @@ import {
 	signOut,
 	syncFeeds,
 } from "./actions";
-import ClassicLayout from "./components/ClassicLayout";
-import GmailLayout from "./components/gmail/GmailLayout";
-import SettingsDrawer from "./components/SettingsDrawer";
-import { toggleListItem } from "./components/utils";
-import { gmailTheme } from "./gmail-theme";
-import { MODE_CONFIG } from "./modes";
 
 function useSimpleSession() {
 	const [status, setStatus] = useState("loading");
