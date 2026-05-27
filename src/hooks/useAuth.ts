@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { checkAuth, signOut as serverSignOut } from "@/app/actions";
+import { checkAuth, signOut } from "@/app/actions/auth-actions";
 import type { AuthStatus } from "@/types";
 
 interface UseAuthReturn {
@@ -17,8 +17,8 @@ export default function useAuth(): UseAuthReturn {
 		});
 	}, []);
 
-	const signOut = async () => {
-		const result = await serverSignOut();
+	const handleSignOut = async () => {
+		const result = await signOut();
 		if (result.success) {
 			window.location.reload();
 		} else {
@@ -29,6 +29,6 @@ export default function useAuth(): UseAuthReturn {
 	return {
 		status,
 		isAuthenticated: status === "authenticated",
-		signOut,
+		signOut: handleSignOut,
 	};
 }
