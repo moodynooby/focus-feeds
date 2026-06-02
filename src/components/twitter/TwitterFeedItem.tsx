@@ -1,14 +1,12 @@
 "use client";
 
-import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
-import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
-import RepeatOutlinedIcon from "@mui/icons-material/RepeatOutlined";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { formatDistanceToNow } from "date-fns";
+import { Heart, MessageSquare, Repeat } from "lucide-react";
 import Image from "next/image";
 import { memo } from "react";
 import type { FeedItem } from "@/types";
@@ -190,7 +188,7 @@ function TwitterFeedItem({ item }: TwitterFeedItemProps) {
 					}}
 				>
 					<IconButton size="small" sx={{ p: 0, color: "inherit" }}>
-						<ChatBubbleOutlineOutlinedIcon fontSize="small" />
+						<MessageSquare size={20} />
 					</IconButton>
 				</Box>
 				<Box
@@ -204,7 +202,7 @@ function TwitterFeedItem({ item }: TwitterFeedItemProps) {
 					}}
 				>
 					<IconButton size="small" sx={{ p: 0, color: "inherit" }}>
-						<RepeatOutlinedIcon fontSize="small" />
+						<Repeat size={20} />
 					</IconButton>
 				</Box>
 				<Box
@@ -218,7 +216,7 @@ function TwitterFeedItem({ item }: TwitterFeedItemProps) {
 					}}
 				>
 					<IconButton size="small" sx={{ p: 0, color: "inherit" }}>
-						<FavoriteBorderOutlinedIcon fontSize="small" />
+						<Heart size={20} />
 					</IconButton>
 				</Box>
 			</Box>

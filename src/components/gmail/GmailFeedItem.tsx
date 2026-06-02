@@ -1,14 +1,11 @@
 "use client";
 
-import HeadphonesOutlinedIcon from "@mui/icons-material/HeadphonesOutlined";
-import StarBorderOutlinedIcon from "@mui/icons-material/StarBorderOutlined";
-import StarOutlinedIcon from "@mui/icons-material/StarOutlined";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
+import { Headphones, Star } from "lucide-react";
 import { memo } from "react";
-import { PODCAST_ACCENT } from "@/lib/theme";
 import type { FeedItem } from "@/types";
 import { formatDate } from "../utils";
 
@@ -58,11 +55,7 @@ function GmailFeedItem({
 					}}
 					sx={{ p: 0.5, color: isStarred ? "#f4b400" : "text.secondary" }}
 				>
-					{isStarred ? (
-						<StarOutlinedIcon fontSize="small" />
-					) : (
-						<StarBorderOutlinedIcon fontSize="small" />
-					)}
+					{isStarred ? <Star size={20} /> : <Star size={20} />}
 				</IconButton>
 			</Box>
 
@@ -75,11 +68,7 @@ function GmailFeedItem({
 					mr: 2,
 				}}
 			>
-				{item.isPodcast && (
-					<HeadphonesOutlinedIcon
-						sx={{ fontSize: 16, color: PODCAST_ACCENT }}
-					/>
-				)}
+				{item.isPodcast && <Headphones size={16} />}
 				<Typography
 					variant="body2"
 					noWrap

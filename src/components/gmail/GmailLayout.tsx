@@ -1,6 +1,5 @@
 "use client";
 
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -9,6 +8,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { Menu as MenuIcon } from "lucide-react";
 import { useState } from "react";
 import type { AuthStatus, FeedItem, ViewMode } from "@/types";
 import AppHeader from "../header/AppHeader";
@@ -133,7 +133,7 @@ export default function GmailLayout({
 						color="inherit"
 						onClick={() => setSidebarOpen(!sidebarOpen)}
 					>
-						<MenuOutlinedIcon />
+						<MenuIcon size={24} />
 					</IconButton>
 				}
 				rightSlot={rightSlot}

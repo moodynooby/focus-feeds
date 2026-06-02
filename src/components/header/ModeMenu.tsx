@@ -1,12 +1,12 @@
 "use client";
 
-import AppsOutlinedIcon from "@mui/icons-material/AppsOutlined";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import { AppWindow } from "lucide-react";
 import { useState } from "react";
 import { MODE_CONFIG, MODE_NAMES } from "@/lib/modes";
 import { useModeContext } from "@/lib/theme";
@@ -27,7 +27,7 @@ export default function ModeMenu() {
 		<>
 			<Tooltip title="Switch Mode">
 				<IconButton color="inherit" onClick={handleOpen}>
-					<AppsOutlinedIcon fontSize="small" />
+					<AppWindow size={20} />
 				</IconButton>
 			</Tooltip>
 			<Menu
@@ -87,7 +87,7 @@ export default function ModeMenu() {
 										}),
 									}}
 								>
-									<Icon sx={{ fontSize: "1.5rem" }} />
+									<Icon size={24} />
 									<Typography variant="caption" sx={{ textAlign: "center" }}>
 										{config.name}
 									</Typography>

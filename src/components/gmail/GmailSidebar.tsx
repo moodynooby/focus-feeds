@@ -1,9 +1,5 @@
 "use client";
 
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined";
-import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
-import StarOutlinedIcon from "@mui/icons-material/StarOutlined";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Drawer from "@mui/material/Drawer";
@@ -14,6 +10,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import { Inbox, Plus, Star, Tag } from "lucide-react";
 import type { ViewMode } from "@/types";
 import { toggleListItem } from "../utils";
 
@@ -43,8 +40,8 @@ export default function GmailSidebar({
 	isMobile,
 }: GmailSidebarProps) {
 	const navItems = [
-		{ id: "inbox" as const, label: "Inbox", icon: <InboxOutlinedIcon /> },
-		{ id: "starred" as const, label: "Starred", icon: <StarOutlinedIcon /> },
+		{ id: "inbox" as const, label: "Inbox", icon: <Inbox size={20} /> },
+		{ id: "starred" as const, label: "Starred", icon: <Star size={20} /> },
 	];
 
 	return (
@@ -76,7 +73,7 @@ export default function GmailSidebar({
 			<Box sx={{ p: 2, pb: 1 }}>
 				<Button
 					variant="contained"
-					startIcon={<AddOutlinedIcon sx={{ fontSize: 28 }} />}
+					startIcon={<Plus size={28} />}
 					onClick={onAddFeed}
 					sx={{
 						height: 56,
@@ -154,7 +151,7 @@ export default function GmailSidebar({
 												color: isSelected ? "primary.main" : "text.secondary",
 											}}
 										>
-											<LabelOutlinedIcon fontSize="small" />
+											<Tag size={20} />
 										</ListItemIcon>
 										<ListItemText
 											primary={source}

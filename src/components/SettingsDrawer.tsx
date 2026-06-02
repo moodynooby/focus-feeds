@@ -1,12 +1,5 @@
 "use client";
 
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteIcon from "@mui/icons-material/Delete";
-import DownloadIcon from "@mui/icons-material/Download";
-import LinkIcon from "@mui/icons-material/Link";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import SettingsIcon from "@mui/icons-material/Settings";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Drawer from "@mui/material/Drawer";
@@ -18,6 +11,15 @@ import Tabs from "@mui/material/Tabs";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
+import {
+	Download,
+	Link,
+	PlusCircle,
+	RefreshCw,
+	Settings,
+	Trash2,
+	X,
+} from "lucide-react";
 import { useState } from "react";
 import type { AuthStatus, SyncStatus } from "@/types";
 import SignIn from "./signIn";
@@ -101,13 +103,13 @@ export default function SettingsDrawer({
 					}}
 				>
 					<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-						<SettingsIcon color="primary" />
+						<Settings size={24} />
 						<Typography variant="h6" sx={{ fontWeight: 600 }}>
 							Settings
 						</Typography>
 					</Box>
 					<IconButton onClick={onClose} size="small">
-						<CloseIcon />
+						<X size={24} />
 					</IconButton>
 				</Box>
 
@@ -141,7 +143,7 @@ export default function SettingsDrawer({
 								}}
 							>
 								<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-									<AddCircleIcon color="primary" fontSize="small" />
+									<PlusCircle size={20} />
 									<Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
 										Add Feed
 									</Typography>
@@ -155,11 +157,7 @@ export default function SettingsDrawer({
 											e.key === "Enter" && handleAdd()
 										}
 										sx={{ flex: 1 }}
-										startAdornment={
-											<LinkIcon
-												sx={{ mr: 1, color: "text.secondary", fontSize: 18 }}
-											/>
-										}
+										startAdornment={<Link size={18} />}
 									/>
 									<Button variant="contained" onClick={handleAdd} size="small">
 										Add
@@ -212,9 +210,7 @@ export default function SettingsDrawer({
 													gap: 1,
 												}}
 											>
-												<LinkIcon
-													sx={{ color: "text.secondary", fontSize: 16 }}
-												/>
+												<Link size={16} />
 												<Typography
 													variant="body2"
 													sx={{
@@ -231,7 +227,7 @@ export default function SettingsDrawer({
 													onClick={() => onRemove(url)}
 													sx={{ color: "error.main" }}
 												>
-													<DeleteIcon fontSize="small" />
+													<Trash2 size={20} />
 												</IconButton>
 											</Paper>
 										))}
@@ -288,7 +284,7 @@ export default function SettingsDrawer({
 											variant="outlined"
 											size="small"
 											onClick={onRefresh}
-											startIcon={<RefreshIcon />}
+											startIcon={<RefreshCw size={20} />}
 											sx={{ flex: 1 }}
 										>
 											Refresh
@@ -395,7 +391,7 @@ export default function SettingsDrawer({
 											variant="contained"
 											fullWidth
 											onClick={onInstall}
-											startIcon={<DownloadIcon />}
+											startIcon={<Download size={20} />}
 										>
 											Install
 										</Button>

@@ -1,8 +1,5 @@
 "use client";
 
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AppBar from "@mui/material/AppBar";
 import Badge from "@mui/material/Badge";
 import Box from "@mui/material/Box";
@@ -14,6 +11,7 @@ import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import { ChevronUp, ListFilter, MoreVertical } from "lucide-react";
 import { useState } from "react";
 import SearchField from "../filter-header/SearchField";
 import ColorModeToggle from "./ColorModeToggle";
@@ -193,9 +191,9 @@ export default function AppHeader({
 							>
 								<Badge badgeContent={0} color="primary">
 									{mobileExpanded ? (
-										<ExpandLessIcon fontSize="small" />
+										<ChevronUp size={20} />
 									) : (
-										<FilterListIcon fontSize="small" />
+										<ListFilter size={20} />
 									)}
 								</Badge>
 							</IconButton>
@@ -207,7 +205,7 @@ export default function AppHeader({
 							size="small"
 							sx={{ color: "text.secondary" }}
 						>
-							<MoreVertIcon fontSize="small" />
+							<MoreVertical size={20} />
 						</IconButton>
 					</Tooltip>
 					<Menu
