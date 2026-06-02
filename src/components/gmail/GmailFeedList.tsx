@@ -9,6 +9,7 @@ import Checkbox from "@mui/material/Checkbox";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
+import { useMemo } from "react";
 import type { FeedItem } from "@/types";
 import EmptyState from "../EmptyState";
 import SkeletonList from "../shared/SkeletonList";
@@ -32,6 +33,8 @@ export default function GmailFeedList({
 	onRefresh,
 }: GmailFeedListProps) {
 	const showSkeleton = loading && items.length === 0;
+
+	const starredSet = useMemo(() => new Set(starredItems), [starredItems]);
 
 	return (
 		<Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
@@ -69,7 +72,7 @@ export default function GmailFeedList({
 						<GmailFeedItem
 							key={item.guid || item.link}
 							item={item}
-							isStarred={starredItems.includes(item.guid || item.link)}
+							isStarred={starredSet.has(item.guid || item.link)}
 							onToggleStar={onToggleStar}
 							onClick={() => onSelectItem(item)}
 						/>

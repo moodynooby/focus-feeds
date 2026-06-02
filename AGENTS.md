@@ -8,6 +8,7 @@ Before any Next.js work, find and read the relevant doc in `node_modules/next/di
 MOVE WITH GIT MV
 ## Commands
 USE PNPM FOR INSTALLING PACKAGES
+WORK IS NOT DONE UNTIL YOU RUN LINT AND TYPECHECK and it passes AND DO NOT WRITE UNSAFE UNTIL YOU DONT HAVE SAFE ALTERNATIVES
 | Command | What it does |
 |---------|-------------|
 | `npm dev` | Dev server on port 3000 |

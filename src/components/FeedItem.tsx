@@ -2,8 +2,8 @@
 
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
-import { useTheme } from "@mui/material/styles";
 import Image from "next/image";
+import { memo } from "react";
 import { PODCAST_ACCENT, PODCAST_ACCENT_RGB } from "@/lib/theme";
 import type { FeedItem as FeedItemType } from "@/types";
 import PodcastPlayer from "./PodcastPlayer";
@@ -14,26 +14,8 @@ interface FeedItemProps {
 	item: FeedItemType;
 }
 
-export default function FeedItem({ item }: FeedItemProps) {
-	const theme = useTheme();
+function FeedItem({ item }: FeedItemProps) {
 	const hostname = getHostname(item.link);
-
-	const podcastHover = {
-		borderColor: `rgba(${PODCAST_ACCENT_RGB}, 0.4)`,
-		boxShadow: `0 4px 20px rgba(${PODCAST_ACCENT_RGB}, 0.15)`,
-	};
-
-	const defaultHover = {
-		transform: "translateY(-2px)",
-		borderColor:
-			theme.palette.mode === "dark"
-				? "rgba(255, 255, 255, 0.2)"
-				: "rgba(0, 0, 0, 0.15)",
-		boxShadow:
-			theme.palette.mode === "dark"
-				? "0 4px 12px rgba(0, 0, 0, 0.2)"
-				: "0 4px 12px rgba(0, 0, 0, 0.08)",
-	};
 
 	return (
 		<Paper
@@ -46,7 +28,18 @@ export default function FeedItem({ item }: FeedItemProps) {
 				border: "1px solid",
 				borderColor: "divider",
 				transition: "all 0.2s ease-in-out",
-				"&:hover": item.isPodcast ? podcastHover : defaultHover,
+				"&:hover": {
+					transform: "translateY(-2px)",
+					borderColor: item.isPodcast
+						? `rgba(${PODCAST_ACCENT_RGB}, 0.4)`
+						: "text.secondary",
+					boxShadow: item.isPodcast
+						? `0 4px 20px rgba(${PODCAST_ACCENT_RGB}, 0.15)`
+						: (theme) =>
+								theme.palette.mode === "dark"
+									? "0 4px 12px rgba(0, 0, 0, 0.4)"
+									: "0 4px 12px rgba(0, 0, 0, 0.08)",
+				},
 			}}
 		>
 			<Box
@@ -131,3 +124,5 @@ export default function FeedItem({ item }: FeedItemProps) {
 		</Paper>
 	);
 }
+
+export default memo(FeedItem);

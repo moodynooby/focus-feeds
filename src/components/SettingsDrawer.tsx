@@ -13,14 +13,12 @@ import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import Input from "@mui/material/Input";
 import Paper from "@mui/material/Paper";
-import { useTheme } from "@mui/material/styles";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
-import { useContext, useState } from "react";
-import { ColorModeContext } from "@/lib/theme";
+import { useState } from "react";
 import type { AuthStatus, SyncStatus } from "@/types";
 import SignIn from "./signIn";
 
@@ -63,8 +61,6 @@ export default function SettingsDrawer({
 	onInstall,
 	installStatus = "available",
 }: SettingsDrawerProps) {
-	const theme = useTheme();
-	const colorMode = useContext(ColorModeContext);
 	const [activeTab, setActiveTab] = useState(0);
 	const [newUrl, setNewUrl] = useState("");
 
@@ -412,22 +408,6 @@ export default function SettingsDrawer({
 									)}
 								</Paper>
 							)}
-
-							<Paper variant="outlined" sx={{ p: 2 }}>
-								<Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
-									Appearance
-								</Typography>
-								<ToggleButtonGroup
-									value={theme.palette.mode}
-									exclusive
-									onChange={() => colorMode.toggleColorMode()}
-									fullWidth
-									size="small"
-								>
-									<ToggleButton value="light">Light</ToggleButton>
-									<ToggleButton value="dark">Dark</ToggleButton>
-								</ToggleButtonGroup>
-							</Paper>
 						</Box>
 					)}
 				</Box>

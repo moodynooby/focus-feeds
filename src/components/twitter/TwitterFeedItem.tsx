@@ -10,6 +10,7 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
+import { memo } from "react";
 import type { FeedItem } from "@/types";
 import PodcastBadge from "../shared/PodcastBadge";
 import { getHostname } from "../utils";
@@ -18,7 +19,7 @@ interface TwitterFeedItemProps {
 	item: FeedItem;
 }
 
-export default function TwitterFeedItem({ item }: TwitterFeedItemProps) {
+function TwitterFeedItem({ item }: TwitterFeedItemProps) {
 	const hostname = getHostname(item.link);
 	const pubDate = new Date(item.pubDate);
 	const timeAgo = formatDistanceToNow(pubDate, { addSuffix: false });
@@ -224,3 +225,5 @@ export default function TwitterFeedItem({ item }: TwitterFeedItemProps) {
 		</Paper>
 	);
 }
+
+export default memo(TwitterFeedItem);

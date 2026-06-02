@@ -1,7 +1,7 @@
 "use client";
 
 import CssBaseline from "@mui/material/CssBaseline";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { createTheme, type Theme, ThemeProvider } from "@mui/material/styles";
 import { Inter } from "next/font/google";
 import {
 	createContext,
@@ -10,6 +10,7 @@ import {
 	useEffect,
 	useMemo,
 	useState,
+	useTransition,
 } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import type { AppMode } from "@/types";
@@ -71,8 +72,8 @@ const getDesignTokens = (mode: Mode) => ({
 			? {
 					primary: {
 						main: "#f8fafc",
-						light: "#ffffff",
-						dark: "#cbd5e1",
+						light: "#cbd5e1",
+						dark: "#94a3b8",
 						contrastText: "#09090b",
 					},
 					secondary: {
@@ -90,6 +91,10 @@ const getDesignTokens = (mode: Mode) => ({
 						secondary: "#a1a1aa",
 					},
 					divider: "rgba(255, 255, 255, 0.08)",
+					action: {
+						hover: "rgba(255, 255, 255, 0.04)",
+						selected: "rgba(255, 255, 255, 0.08)",
+					},
 				}
 			: {
 					primary: {
@@ -113,6 +118,10 @@ const getDesignTokens = (mode: Mode) => ({
 						secondary: "#52525b",
 					},
 					divider: "rgba(0, 0, 0, 0.08)",
+					action: {
+						hover: "rgba(0, 0, 0, 0.04)",
+						selected: "rgba(0, 0, 0, 0.08)",
+					},
 				}),
 	},
 	shape: {
@@ -133,73 +142,87 @@ const getDesignTokens = (mode: Mode) => ({
 					padding: "8px 16px",
 					"&:hover": {
 						boxShadow: "none",
-						backgroundColor:
-							mode === "dark"
-								? "rgba(255, 255, 255, 0.08)"
-								: "rgba(0, 0, 0, 0.04)",
 					},
 				},
-				containedPrimary: {
-					backgroundColor: mode === "dark" ? "#f8fafc" : "#18181b",
-					color: mode === "dark" ? "#09090b" : "#ffffff",
+				containedPrimary: ({ theme }: { theme: Theme }) => ({
+					backgroundColor: theme.palette.primary.main,
+					color: theme.palette.primary.contrastText,
 					"&:hover": {
-						backgroundColor: mode === "dark" ? "#e2e8f0" : "#27272a",
+						backgroundColor:
+							theme.palette.mode === "dark"
+								? theme.palette.primary.light
+								: theme.palette.primary.light,
 					},
-				},
+				}),
 			},
 		},
 		MuiTab: {
 			styleOverrides: {
-				root: {
+				root: ({ theme }: { theme: Theme }) => ({
 					textTransform: "none",
 					fontWeight: 500,
 					fontSize: "0.95rem",
 					minHeight: "48px",
-					color: mode === "dark" ? "#a1a1aa" : "#71717a",
+					color: theme.palette.text.secondary,
 					"&.Mui-selected": {
-						color: mode === "dark" ? "#f8fafc" : "#18181b",
+						color: theme.palette.text.primary,
 					},
-				},
+				}),
 			},
 		},
 		MuiCard: {
 			styleOverrides: {
-				root: {
-					backgroundColor: mode === "dark" ? "#18181b" : "#ffffff",
-					border: `1px solid ${mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)"}`,
-				},
+				root: ({ theme }: { theme: Theme }) => ({
+					backgroundColor: theme.palette.background.paper,
+					border: `1px solid ${theme.palette.divider}`,
+					backgroundImage: "none",
+				}),
+			},
+		},
+		MuiPaper: {
+			styleOverrides: {
+				root: ({ theme }: { theme: Theme }) => ({
+					backgroundImage: "none",
+					...(theme.palette.mode === "dark"
+						? {
+								boxShadow: "none",
+								border: `1px solid ${theme.palette.divider}`,
+							}
+						: {
+								border: `1px solid ${theme.palette.divider}`,
+							}),
+				}),
 			},
 		},
 		MuiCssBaseline: {
-			styleOverrides: {
+			styleOverrides: (theme: Theme) => ({
 				body: {
-					scrollbarColor:
-						mode === "dark" ? "#27272a #09090b" : "#e4e4e7 #ffffff",
+					scrollbarColor: `${theme.palette.divider} ${theme.palette.background.default}`,
 					"&::-webkit-scrollbar, & *::-webkit-scrollbar": {
-						backgroundColor: mode === "dark" ? "#09090b" : "#ffffff",
+						backgroundColor: theme.palette.background.default,
 						width: "8px",
 						height: "8px",
 					},
 					"&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb": {
 						borderRadius: 8,
-						backgroundColor: mode === "dark" ? "#27272a" : "#e4e4e7",
+						backgroundColor: theme.palette.divider,
 						minHeight: 24,
-						border: `2px solid ${mode === "dark" ? "#09090b" : "#ffffff"}`,
+						border: `2px solid ${theme.palette.background.default}`,
 					},
 					"&::-webkit-scrollbar-thumb:focus, & *::-webkit-scrollbar-thumb:focus":
 						{
-							backgroundColor: mode === "dark" ? "#3f3f46" : "#d4d4d8",
+							backgroundColor: theme.palette.text.secondary,
 						},
 					"&::-webkit-scrollbar-thumb:active, & *::-webkit-scrollbar-thumb:active":
 						{
-							backgroundColor: mode === "dark" ? "#3f3f46" : "#d4d4d8",
+							backgroundColor: theme.palette.text.secondary,
 						},
 					"&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover":
 						{
-							backgroundColor: mode === "dark" ? "#3f3f46" : "#d4d4d8",
+							backgroundColor: theme.palette.text.secondary,
 						},
 				},
-			},
+			}),
 		},
 	},
 });
@@ -209,7 +232,7 @@ const getGmailDesignTokens = (mode: Mode) => ({
 		mode,
 		primary: {
 			main: "#0b57d0",
-			light: "#eaf1fb",
+			light: mode === "dark" ? "#004a77" : "#c2e7ff",
 			dark: "#0842a0",
 			contrastText: "#ffffff",
 		},
@@ -221,7 +244,11 @@ const getGmailDesignTokens = (mode: Mode) => ({
 			primary: mode === "dark" ? "#e3e2e6" : "#1f1f1f",
 			secondary: mode === "dark" ? "#c4c6d0" : "#444746",
 		},
-		divider: mode === "dark" ? "#444746" : "#e0e2e0",
+		divider: mode === "dark" ? "rgba(255, 255, 255, 0.12)" : "#e0e2e0",
+		action: {
+			hover:
+				mode === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.04)",
+		},
 	},
 	shape: {
 		borderRadius: 12,
@@ -234,25 +261,29 @@ const getGmailDesignTokens = (mode: Mode) => ({
 			styleOverrides: {
 				root: {
 					borderRadius: 24,
+					textTransform: "none",
 				},
 			},
 		},
 		MuiListItemButton: {
 			styleOverrides: {
-				root: {
+				root: ({ theme }: { theme: Theme }) => ({
 					borderRadius: 24,
 					margin: "0 8px",
 					"&.Mui-selected": {
-						backgroundColor: mode === "dark" ? "#004a77" : "#c2e7ff",
-						color: mode === "dark" ? "#c2e7ff" : "#001d35",
+						backgroundColor: theme.palette.primary.light,
+						color:
+							theme.palette.mode === "dark"
+								? theme.palette.primary.contrastText
+								: "#001d35",
 						"&:hover": {
-							backgroundColor: mode === "dark" ? "#004a77" : "#c2e7ff",
+							backgroundColor: theme.palette.primary.light,
 						},
 						"& .MuiListItemIcon-root": {
-							color: mode === "dark" ? "#c2e7ff" : "#001d35",
+							color: "inherit",
 						},
 					},
-				},
+				}),
 			},
 		},
 	},
@@ -263,7 +294,7 @@ const getTwitterDesignTokens = (mode: Mode) => ({
 		mode,
 		primary: {
 			main: "#1d9bf0",
-			light: "#1d9bf026",
+			light: "rgba(29, 155, 240, 0.1)",
 			dark: "#1976d2",
 			contrastText: "#ffffff",
 		},
@@ -276,17 +307,8 @@ const getTwitterDesignTokens = (mode: Mode) => ({
 			secondary: mode === "dark" ? "#71767b" : "#536471",
 		},
 		divider: mode === "dark" ? "#2f3336" : "#eff3f4",
-		grey: {
-			50: "#f9f9f9",
-			100: "#f0f0f0",
-			200: "#e0e0e0",
-			300: "#c4c4c4",
-			400: "#a3a3a3",
-			500: "#828282",
-			600: "#616161",
-			700: "#424242",
-			800: "#212121",
-			900: "#000000",
+		action: {
+			hover: "rgba(29, 155, 240, 0.1)",
 		},
 	},
 	shape: {
@@ -307,23 +329,22 @@ const getTwitterDesignTokens = (mode: Mode) => ({
 				root: {
 					borderRadius: 999,
 					fontWeight: 700,
+					textTransform: "none",
 				},
 			},
 		},
 		MuiPaper: {
 			styleOverrides: {
-				root: {
-					border: `1px solid ${mode === "dark" ? "#2f3336" : "#eff3f4"}`,
-				},
+				root: ({ theme }: { theme: Theme }) => ({
+					border: `1px solid ${theme.palette.divider}`,
+					backgroundImage: "none",
+				}),
 			},
 		},
 		MuiListItemButton: {
 			styleOverrides: {
 				root: {
 					borderRadius: 999,
-					"&:hover": {
-						backgroundColor: "rgba(29, 155, 240, 0.1)",
-					},
 				},
 			},
 		},
@@ -343,6 +364,7 @@ export default function ThemeRegistry({ children }: { children: ReactNode }) {
 		"focusFeedsMode",
 		"classic",
 	);
+	const [_isPending, startTransition] = useTransition();
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
@@ -363,6 +385,13 @@ export default function ThemeRegistry({ children }: { children: ReactNode }) {
 		},
 	};
 
+	const setModeWithTransition = (nextMode: AppMode) => {
+		if (nextMode === appMode) return;
+		startTransition(() => {
+			setAppMode(nextMode);
+		});
+	};
+
 	const theme = useMemo(() => {
 		let modeTokens: Parameters<typeof createTheme>[0];
 		switch (appMode) {
@@ -379,7 +408,9 @@ export default function ThemeRegistry({ children }: { children: ReactNode }) {
 	}, [appMode, colorMode]);
 
 	return (
-		<ModeContext.Provider value={{ mode: appMode, setMode: setAppMode }}>
+		<ModeContext.Provider
+			value={{ mode: appMode, setMode: setModeWithTransition }}
+		>
 			<ColorModeContext.Provider value={colorModeContext}>
 				<ThemeProvider theme={theme}>
 					<CssBaseline />

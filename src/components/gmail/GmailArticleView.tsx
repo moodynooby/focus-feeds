@@ -80,7 +80,7 @@ export default function GmailArticleView({
 							display: "flex",
 							alignItems: "center",
 							justifyContent: "center",
-							color: "white",
+							color: "primary.contrastText",
 						}}
 					>
 						{item.source?.[0] || "U"}

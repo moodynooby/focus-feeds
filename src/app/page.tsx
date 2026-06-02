@@ -1,6 +1,5 @@
 "use client";
 
-import { Fab, Tooltip } from "@mui/material";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useLocalStorage } from "usehooks-ts";
@@ -15,9 +14,8 @@ import useOnlineStatus from "@/hooks/useOnlineStatus";
 import usePWAInstall from "@/hooks/usePWAInstall";
 import useServiceWorker from "@/hooks/useServiceWorker";
 import useStarredItems from "@/hooks/useStarredItems";
-import { MODE_CONFIG } from "@/lib/modes";
 import { useModeContext } from "@/lib/theme";
-import type { AppMode, FeedDuration, FeedItem } from "@/types";
+import type { FeedDuration, FeedItem } from "@/types";
 import { addUserFeed, fetchFeeds, removeUserFeed } from "./actions";
 
 const ITEMS_PER_BATCH = 20;
@@ -35,7 +33,7 @@ export default function FeedManager() {
 		"focusFeedsDuration",
 		"week",
 	);
-	const { mode, setMode } = useModeContext();
+	const { mode } = useModeContext();
 
 	const { data, error, isLoading, mutate } = useSWR(
 		urls.length > 0 ? [urls, duration] : null,
@@ -98,10 +96,6 @@ export default function FeedManager() {
 	};
 
 	const refresh = () => mutate(undefined, { revalidate: true });
-
-	const currentMode = MODE_CONFIG[mode] || MODE_CONFIG.classic;
-	const nextMode = currentMode.nextMode;
-	const nextConfig = MODE_CONFIG[nextMode as keyof typeof MODE_CONFIG];
 
 	const content =
 		mode === "gmail" ? (
@@ -168,17 +162,6 @@ export default function FeedManager() {
 	return (
 		<>
 			{content}
-
-			<Tooltip title={nextConfig.fabTooltip}>
-				<Fab
-					color="primary"
-					aria-label={nextConfig.fabAriaLabel}
-					onClick={() => setMode(nextMode as AppMode)}
-					sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 2000 }}
-				>
-					<nextConfig.icon />
-				</Fab>
-			</Tooltip>
 
 			<SettingsDrawer
 				open={drawerOpen}

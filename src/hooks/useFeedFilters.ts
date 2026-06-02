@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import type { FeedItem, ViewMode } from "@/types";
 
@@ -33,39 +33,54 @@ export default function useFeedFilters(
 	const [debouncedSearchQuery] = useDebounceValue(searchQuery, 300);
 	const prevFiltersRef = useRef({ search: "", sources: [] as string[] });
 
-	const sources = [
-		...new Set(items.map((item) => item.feedTitle || item.source || "Unknown")),
-	].sort();
+	const sources = useMemo(() => {
+		return [
+			...new Set(
+				items.map((item) => item.feedTitle || item.source || "Unknown"),
+			),
+		].sort();
+	}, [items]);
 
-	const filteredItems = items.filter((item) => {
-		if (starredConfig && starredConfig.view === "starred") {
-			const itemId = item.guid || item.link;
-			if (!starredConfig.starredItems.includes(itemId)) {
-				return false;
+	const filteredItems = useMemo(() => {
+		const searchLower = debouncedSearchQuery.toLowerCase();
+		const sourceSet =
+			selectedSources.length > 0 ? new Set(selectedSources) : null;
+		const starredSet =
+			starredConfig?.view === "starred"
+				? new Set(starredConfig.starredItems)
+				: null;
+
+		return items.filter((item) => {
+			if (starredSet) {
+				const itemId = item.guid || item.link;
+				if (!starredSet.has(itemId)) {
+					return false;
+				}
 			}
-		}
 
-		const matchesSearch = debouncedSearchQuery
-			? (item.title || "")
-					.toLowerCase()
-					.includes(debouncedSearchQuery.toLowerCase()) ||
-				(item.contentSnippet || "")
-					.toLowerCase()
-					.includes(debouncedSearchQuery.toLowerCase()) ||
-				(item.content || "")
-					.toLowerCase()
-					.includes(debouncedSearchQuery.toLowerCase())
-			: true;
+			if (sourceSet) {
+				if (!sourceSet.has(item.feedTitle || item.source || "Unknown")) {
+					return false;
+				}
+			}
 
-		const matchesSource =
-			selectedSources.length > 0
-				? selectedSources.includes(item.feedTitle || item.source || "Unknown")
-				: true;
+			if (debouncedSearchQuery) {
+				const matchesSearch =
+					(item.title || "").toLowerCase().includes(searchLower) ||
+					(item.contentSnippet || "").toLowerCase().includes(searchLower) ||
+					(item.content || "").toLowerCase().includes(searchLower);
 
-		return matchesSearch && matchesSource;
-	});
+				if (!matchesSearch) return false;
+			}
 
-	const visibleItems = filteredItems.slice(0, displayLimit);
+			return true;
+		});
+	}, [items, debouncedSearchQuery, selectedSources, starredConfig]);
+
+	const visibleItems = useMemo(() => {
+		return filteredItems.slice(0, displayLimit);
+	}, [filteredItems, displayLimit]);
+
 	const hasMoreItems = filteredItems.length > displayLimit;
 
 	useEffect(() => {

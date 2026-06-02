@@ -4,37 +4,37 @@ import FilterListOffIcon from "@mui/icons-material/FilterListOff";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
+import ColorModeToggle from "./ColorModeToggle";
+import ModeMenu from "./ModeMenu";
 
-interface FilterActionsProps {
+interface HeaderActionsProps {
 	onRefresh: () => void;
 	onOpenSettings: () => void;
-	onClearFilters: () => void;
-	showClearButton?: boolean;
+	onClearFilters?: () => void;
 	loading?: boolean;
 }
 
-export default function FilterActions({
+export default function HeaderActions({
 	onRefresh,
 	onOpenSettings,
 	onClearFilters,
-	showClearButton = false,
 	loading = false,
-}: FilterActionsProps) {
+}: HeaderActionsProps) {
 	return (
 		<Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-			{showClearButton && (
+			<ModeMenu />
+			<ColorModeToggle />
+			{onClearFilters && (
 				<Tooltip title="Clear all filters">
-					<Button
-						size="small"
-						startIcon={<FilterListOffIcon />}
+					<IconButton
 						onClick={onClearFilters}
-						sx={{ mr: 1, textTransform: "none" }}
+						size="small"
+						sx={{ color: "text.secondary" }}
 					>
-						Clear
-					</Button>
+						<FilterListOffIcon fontSize="small" />
+					</IconButton>
 				</Tooltip>
 			)}
 			<Tooltip title={loading ? "Loading..." : "Refresh feeds"}>

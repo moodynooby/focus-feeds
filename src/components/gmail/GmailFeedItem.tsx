@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
+import { memo } from "react";
 import { PODCAST_ACCENT } from "@/lib/theme";
 import type { FeedItem } from "@/types";
 import { formatDate } from "../utils";
@@ -18,7 +19,7 @@ interface GmailFeedItemProps {
 	onClick: () => void;
 }
 
-export default function GmailFeedItem({
+function GmailFeedItem({
 	item,
 	isStarred,
 	onToggleStar,
@@ -38,8 +39,7 @@ export default function GmailFeedItem({
 				bgcolor: "background.paper",
 				cursor: "pointer",
 				"&:hover": {
-					boxShadow:
-						"inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)",
+					bgcolor: "action.hover",
 					zIndex: 1,
 				},
 			}}
@@ -124,3 +124,5 @@ export default function GmailFeedItem({
 		</Box>
 	);
 }
+
+export default memo(GmailFeedItem);

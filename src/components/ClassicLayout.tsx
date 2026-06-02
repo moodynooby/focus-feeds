@@ -3,7 +3,8 @@
 import Box from "@mui/material/Box";
 import type { FailedFeed, FeedItem } from "@/types";
 import FeedList from "./FeedList";
-import FilterHeader from "./filter-header/FilterHeader";
+import SourceFilter from "./filter-header/SourceFilter";
+import AppHeader from "./header/AppHeader";
 import OfflineBanner from "./shared/OfflineBanner";
 
 interface ClassicLayoutProps {
@@ -48,12 +49,16 @@ export default function ClassicLayout({
 	return (
 		<>
 			{!isOnline && <OfflineBanner />}
-			<FilterHeader
+			<AppHeader
 				searchQuery={searchQuery}
 				onSearchChange={onSearchChange}
-				sources={sources}
-				selectedSources={selectedSources}
-				onSourcesChange={onSourcesChange}
+				sourceFilter={
+					<SourceFilter
+						sources={sources}
+						selectedSources={selectedSources}
+						onChange={onSourcesChange}
+					/>
+				}
 				onRefresh={onRefresh}
 				onOpenSettings={onOpenSettings}
 				onClearFilters={onClearFilters}

@@ -4,7 +4,8 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import type { FeedItem } from "@/types";
 import EmptyState from "../EmptyState";
-import FilterHeader from "../filter-header/FilterHeader";
+import SourceFilter from "../filter-header/SourceFilter";
+import AppHeader from "../header/AppHeader";
 import OfflineBanner from "../shared/OfflineBanner";
 import SkeletonList from "../shared/SkeletonList";
 import TwitterFeedItem from "./TwitterFeedItem";
@@ -56,12 +57,16 @@ export default function TwitterLayout({
 		>
 			{!isOnline && <OfflineBanner />}
 
-			<FilterHeader
+			<AppHeader
 				searchQuery={searchQuery}
 				onSearchChange={onSearchChange}
-				sources={sources}
-				selectedSources={selectedSources}
-				onSourcesChange={onSourcesChange}
+				sourceFilter={
+					<SourceFilter
+						sources={sources}
+						selectedSources={selectedSources}
+						onChange={onSourcesChange}
+					/>
+				}
 				onRefresh={onRefresh}
 				onOpenSettings={onOpenSettings}
 				onClearFilters={onClearFilters}
