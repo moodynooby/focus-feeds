@@ -1,7 +1,6 @@
 "use client";
 
 import { Fab, Tooltip } from "@mui/material";
-import { ThemeProvider, useTheme } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useLocalStorage } from "usehooks-ts";
@@ -16,8 +15,8 @@ import useOnlineStatus from "@/hooks/useOnlineStatus";
 import usePWAInstall from "@/hooks/usePWAInstall";
 import useServiceWorker from "@/hooks/useServiceWorker";
 import useStarredItems from "@/hooks/useStarredItems";
-import { gmailTheme } from "@/lib/gmail-theme";
 import { MODE_CONFIG } from "@/lib/modes";
+import { useModeContext } from "@/lib/theme";
 import type { AppMode, FeedDuration, FeedItem } from "@/types";
 import { addUserFeed, fetchFeeds, removeUserFeed } from "./actions";
 
@@ -36,7 +35,7 @@ export default function FeedManager() {
 		"focusFeedsDuration",
 		"week",
 	);
-	const [mode, setMode] = useLocalStorage<AppMode>("focusFeedsMode", "classic");
+	const { mode, setMode } = useModeContext();
 
 	const { data, error, isLoading, mutate } = useSWR(
 		urls.length > 0 ? [urls, duration] : null,
@@ -100,34 +99,31 @@ export default function FeedManager() {
 
 	const refresh = () => mutate(undefined, { revalidate: true });
 
-	const theme = useTheme();
 	const currentMode = MODE_CONFIG[mode] || MODE_CONFIG.classic;
 	const nextMode = currentMode.nextMode;
 	const nextConfig = MODE_CONFIG[nextMode as keyof typeof MODE_CONFIG];
 
 	const content =
 		mode === "gmail" ? (
-			<ThemeProvider theme={gmailTheme(theme.palette.mode)}>
-				<GmailLayout
-					searchQuery={filters.searchQuery}
-					onSearchChange={filters.setSearchQuery}
-					sources={filters.sources}
-					selectedSources={filters.selectedSources}
-					onSourcesChange={filters.setSelectedSources}
-					items={filters.filteredItems}
-					starredItems={starredItems}
-					onToggleStar={toggleStar}
-					onOpenSettings={() => setDrawerOpen(true)}
-					onSignOut={signOut}
-					status={status}
-					loading={isLoading}
-					onAddFeed={() => setDrawerOpen(true)}
-					view={view}
-					onViewChange={setView}
-					onRefresh={refresh}
-					isOnline={isOnline}
-				/>
-			</ThemeProvider>
+			<GmailLayout
+				searchQuery={filters.searchQuery}
+				onSearchChange={filters.setSearchQuery}
+				sources={filters.sources}
+				selectedSources={filters.selectedSources}
+				onSourcesChange={filters.setSelectedSources}
+				items={filters.filteredItems}
+				starredItems={starredItems}
+				onToggleStar={toggleStar}
+				onOpenSettings={() => setDrawerOpen(true)}
+				onSignOut={signOut}
+				status={status}
+				loading={isLoading}
+				onAddFeed={() => setDrawerOpen(true)}
+				view={view}
+				onViewChange={setView}
+				onRefresh={refresh}
+				isOnline={isOnline}
+			/>
 		) : mode === "twitter" ? (
 			<TwitterLayout
 				searchQuery={filters.searchQuery}

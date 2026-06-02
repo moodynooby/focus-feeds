@@ -1,8 +1,7 @@
 "use client";
 
 import Box from "@mui/material/Box";
-import { ThemeProvider } from "@mui/material/styles";
-import { twitterTheme } from "@/lib/twitter-theme";
+import Button from "@mui/material/Button";
 import type { FeedItem } from "@/types";
 import EmptyState from "../EmptyState";
 import FilterHeader from "../filter-header/FilterHeader";
@@ -48,92 +47,80 @@ export default function TwitterLayout({
 	isOnline = true,
 }: TwitterLayoutProps) {
 	return (
-		<ThemeProvider theme={twitterTheme("dark")}>
+		<Box
+			sx={{
+				minHeight: "100vh",
+				bgcolor: "background.default",
+				color: "text.primary",
+			}}
+		>
+			{!isOnline && <OfflineBanner />}
+
+			<FilterHeader
+				searchQuery={searchQuery}
+				onSearchChange={onSearchChange}
+				sources={sources}
+				selectedSources={selectedSources}
+				onSourcesChange={onSourcesChange}
+				onRefresh={onRefresh}
+				onOpenSettings={onOpenSettings}
+				onClearFilters={onClearFilters}
+				filteredCount={filteredCount}
+				totalCount={totalCount}
+				loading={loading}
+			/>
+
 			<Box
 				sx={{
-					minHeight: "100vh",
-					bgcolor: "background.default",
-					color: "text.primary",
+					maxWidth: "600px",
+					mx: "auto",
+					pb: 4,
+					pt: 2,
+					px: 2,
 				}}
 			>
-				{!isOnline && <OfflineBanner />}
+				{loading && items.length === 0 ? (
+					<SkeletonList rows={10} />
+				) : error ? (
+					<EmptyState
+						message="Error loading feeds"
+						actionLabel={error ? "Retry" : undefined}
+						onAction={onRefresh}
+					/>
+				) : items.length === 0 ? (
+					<EmptyState
+						message="No articles found"
+						actionLabel="Adjust filters"
+						onAction={onRefresh}
+					/>
+				) : (
+					<>
+						{items.map((item) => (
+							<TwitterFeedItem key={item.guid || item.link} item={item} />
+						))}
 
-				<FilterHeader
-					searchQuery={searchQuery}
-					onSearchChange={onSearchChange}
-					sources={sources}
-					selectedSources={selectedSources}
-					onSourcesChange={onSourcesChange}
-					onRefresh={onRefresh}
-					onOpenSettings={onOpenSettings}
-					onClearFilters={onClearFilters}
-					filteredCount={filteredCount}
-					totalCount={totalCount}
-					loading={loading}
-				/>
-
-				<Box
-					sx={{
-						maxWidth: "600px",
-						mx: "auto",
-						pb: 4,
-						pt: 2,
-						px: 2,
-					}}
-				>
-					{loading && items.length === 0 ? (
-						<SkeletonList rows={10} />
-					) : error ? (
-						<EmptyState
-							message="Error loading feeds"
-							actionLabel={error ? "Retry" : undefined}
-							onAction={onRefresh}
-						/>
-					) : items.length === 0 ? (
-						<EmptyState
-							message="No articles found"
-							actionLabel="Adjust filters"
-							onAction={onRefresh}
-						/>
-					) : (
-						<>
-							{items.map((item) => (
-								<TwitterFeedItem key={item.guid || item.link} item={item} />
-							))}
-
-							{hasMoreItems && (
-								<Box
+						{hasMoreItems && (
+							<Box
+								sx={{
+									textAlign: "center",
+									py: 3,
+								}}
+							>
+								<Button
+									variant="outlined"
+									onClick={onLoadMore}
 									sx={{
-										textAlign: "center",
-										py: 3,
+										borderRadius: 999,
+										fontWeight: 700,
 									}}
 								>
-									<Box
-										component="button"
-										onClick={onLoadMore}
-										sx={{
-											bgcolor: "rgba(29, 155, 240, 0.1)",
-											color: "#1d9bf0",
-											border: "none",
-											borderRadius: 999,
-											py: 1,
-											px: 3,
-											fontWeight: 700,
-											fontSize: "0.875rem",
-											cursor: "pointer",
-											"&:hover": {
-												bgcolor: "rgba(29, 155, 240, 0.2)",
-											},
-										}}
-									>
-										Show more
-									</Box>
-								</Box>
-							)}
-						</>
-					)}
-				</Box>
+									Show more
+								</Button>
+							</Box>
+						)}
+					</>
+				)}
 			</Box>
-		</ThemeProvider>
+		</Box>
 	);
 }

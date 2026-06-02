@@ -14,7 +14,7 @@ USE PNPM FOR INSTALLING PACKAGES
 | `npm build` | Production build |
 | `npm start` | Production start |
 | `npm lint` | Biome check --fix |
-| `npm format` | Biome format --write |
+| `npm typecheck` | TypeScript type checking |
 
 ## Key facts
 

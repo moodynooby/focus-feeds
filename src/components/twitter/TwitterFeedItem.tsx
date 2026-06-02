@@ -2,7 +2,6 @@
 
 import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
-import HeadphonesIcon from "@mui/icons-material/Headphones";
 import RepeatOutlinedIcon from "@mui/icons-material/RepeatOutlined";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -12,6 +11,7 @@ import Typography from "@mui/material/Typography";
 import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
 import type { FeedItem } from "@/types";
+import PodcastBadge from "../shared/PodcastBadge";
 import { getHostname } from "../utils";
 
 interface TwitterFeedItemProps {
@@ -55,7 +55,7 @@ export default function TwitterFeedItem({ item }: TwitterFeedItemProps) {
 				borderColor: "divider",
 				transition: "background-color 0.2s ease",
 				"&:hover": {
-					bgcolor: "rgba(29, 155, 240, 0.05)",
+					bgcolor: "action.hover",
 					cursor: "pointer",
 				},
 			}}
@@ -114,27 +114,7 @@ export default function TwitterFeedItem({ item }: TwitterFeedItemProps) {
 							@{hostname.replace("www.", "").split(".")[0]}
 						</Typography>
 
-						{item.isPodcast && (
-							<Box
-								sx={{
-									display: "flex",
-									alignItems: "center",
-									gap: 0.5,
-									px: 1,
-									py: 0.25,
-									borderRadius: 1,
-									bgcolor: "rgba(29, 155, 240, 0.15)",
-									color: "#1d9bf0",
-									fontSize: "0.7rem",
-									fontWeight: 600,
-									textTransform: "uppercase",
-									letterSpacing: "0.5px",
-								}}
-							>
-								<HeadphonesIcon sx={{ fontSize: 12 }} />
-								Podcast
-							</Box>
-						)}
+						{item.isPodcast && <PodcastBadge />}
 
 						<Typography
 							variant="caption"
@@ -160,7 +140,7 @@ export default function TwitterFeedItem({ item }: TwitterFeedItemProps) {
 							color: "text.primary",
 							textDecoration: "none",
 							"&:hover": {
-								color: "#1d9bf0",
+								color: "primary.main",
 								textDecoration: "underline",
 							},
 						}}
@@ -204,7 +184,7 @@ export default function TwitterFeedItem({ item }: TwitterFeedItemProps) {
 						alignItems: "center",
 						gap: 0.5,
 						"&:hover": {
-							color: "#1d9bf0",
+							color: "primary.main",
 						},
 					}}
 				>

@@ -1,8 +1,10 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import { useTheme } from "@mui/material/styles";
 import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
+import { PODCAST_ACCENT, PODCAST_ACCENT_RGB } from "@/lib/theme";
 
 const Plyr = dynamic(
 	// biome-ignore lint/suspicious/noExplicitAny: plyr-react module export is dynamic
@@ -22,6 +24,7 @@ export default function PodcastPlayer({
 	audioUrl,
 	audioType = "audio/mpeg",
 }: PodcastPlayerProps) {
+	const theme = useTheme();
 	if (!audioUrl) return null;
 
 	const plyrSource = {
@@ -50,13 +53,12 @@ export default function PodcastPlayer({
 			sx={{
 				mt: 2,
 				"& .plyr": {
-					"--plyr-color-main": "#a855f7",
-					"--plyr-audio-controls-background": "#18181b",
-					"--plyr-audio-control-color": "#fafafa",
-					"--plyr-audio-control-color-hover": "#a855f7",
-					"--plyr-range-fill-background": "#a855f7",
-					"--plyr-audio-progress-buffered-background":
-						"rgba(168, 85, 247, 0.25)",
+					"--plyr-color-main": PODCAST_ACCENT,
+					"--plyr-audio-controls-background": theme.palette.background.paper,
+					"--plyr-audio-control-color": theme.palette.text.primary,
+					"--plyr-audio-control-color-hover": PODCAST_ACCENT,
+					"--plyr-range-fill-background": PODCAST_ACCENT,
+					"--plyr-audio-progress-buffered-background": `rgba(${PODCAST_ACCENT_RGB}, 0.25)`,
 					"--plyr-range-thumb-background": "#fff",
 					"--plyr-range-thumb-shadow": "0 1px 4px rgba(0, 0, 0, 0.4)",
 					borderRadius: "12px",
