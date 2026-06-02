@@ -16,7 +16,7 @@ export interface FeedItem {
 
 export type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 
-export type AppMode = "classic" | "gmail";
+export type AppMode = "classic" | "gmail" | "twitter";
 
 export type ViewMode = "inbox" | "starred";
 

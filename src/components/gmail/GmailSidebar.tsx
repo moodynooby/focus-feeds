@@ -83,8 +83,7 @@ export default function GmailSidebar({
 						borderRadius: 16,
 						px: open ? 3 : 1.5,
 						minWidth: open ? 120 : 56,
-						bgcolor: (theme) =>
-							theme.palette.mode === "dark" ? "#444746" : "#c2e7ff",
+						bgcolor: "primary.light",
 						color: (theme) =>
 							theme.palette.mode === "dark" ? "#e3e2e6" : "#001d35",
 						boxShadow: "none",

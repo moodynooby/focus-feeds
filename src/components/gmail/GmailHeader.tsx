@@ -28,12 +28,12 @@ const Search = styled("div")(({ theme }) => ({
 	backgroundColor:
 		theme.palette.mode === "dark"
 			? alpha(theme.palette.common.white, 0.05)
-			: "#eaf1fb",
+			: theme.palette.primary.light,
 	"&:hover": {
 		backgroundColor:
 			theme.palette.mode === "dark"
 				? alpha(theme.palette.common.white, 0.1)
-				: "#dde7f5",
+				: alpha(theme.palette.primary.main, 0.12),
 	},
 	marginRight: theme.spacing(2),
 	marginLeft: 0,

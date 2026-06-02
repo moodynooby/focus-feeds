@@ -1,4 +1,5 @@
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import TagIcon from "@mui/icons-material/Tag";
 
 export const MODE_CONFIG = {
 	classic: {
@@ -14,12 +15,22 @@ export const MODE_CONFIG = {
 	gmail: {
 		name: "Gmail",
 		icon: AutoFixHighIcon,
-		nextMode: "classic",
-		fabTooltip: "Switch to Classic Mode",
-		fabAriaLabel: "classic-mode",
+		nextMode: "twitter",
+		fabTooltip: "Switch to Twitter Mode",
+		fabAriaLabel: "twitter-mode",
 		hasSidebar: true,
 		hasInlineArticleView: true,
 		hasStarring: true,
+	},
+	twitter: {
+		name: "Twitter",
+		icon: TagIcon,
+		nextMode: "classic",
+		fabTooltip: "Switch to Classic Mode",
+		fabAriaLabel: "classic-mode",
+		hasSidebar: false,
+		hasInlineArticleView: false,
+		hasStarring: false,
 	},
 };
 

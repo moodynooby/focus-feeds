@@ -1,30 +1,39 @@
 "use client";
 
-import HeadphonesIcon from "@mui/icons-material/Headphones";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
+import { useTheme } from "@mui/material/styles";
 import Image from "next/image";
+import { PODCAST_ACCENT, PODCAST_ACCENT_RGB } from "@/lib/theme";
 import type { FeedItem as FeedItemType } from "@/types";
 import PodcastPlayer from "./PodcastPlayer";
+import PodcastBadge from "./shared/PodcastBadge";
 import { formatDate, formatDuration, getHostname } from "./utils";
-
-const podcastHover = {
-	borderColor: "rgba(168, 85, 247, 0.4)",
-	boxShadow: "0 4px 20px rgba(168, 85, 247, 0.15)",
-};
-
-const defaultHover = {
-	transform: "translateY(-2px)",
-	borderColor: "rgba(255, 255, 255, 0.2)",
-	boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-};
 
 interface FeedItemProps {
 	item: FeedItemType;
 }
 
 export default function FeedItem({ item }: FeedItemProps) {
+	const theme = useTheme();
 	const hostname = getHostname(item.link);
+
+	const podcastHover = {
+		borderColor: `rgba(${PODCAST_ACCENT_RGB}, 0.4)`,
+		boxShadow: `0 4px 20px rgba(${PODCAST_ACCENT_RGB}, 0.15)`,
+	};
+
+	const defaultHover = {
+		transform: "translateY(-2px)",
+		borderColor:
+			theme.palette.mode === "dark"
+				? "rgba(255, 255, 255, 0.2)"
+				: "rgba(0, 0, 0, 0.15)",
+		boxShadow:
+			theme.palette.mode === "dark"
+				? "0 4px 12px rgba(0, 0, 0, 0.2)"
+				: "0 4px 12px rgba(0, 0, 0, 0.08)",
+	};
 
 	return (
 		<Paper
@@ -67,27 +76,7 @@ export default function FeedItem({ item }: FeedItemProps) {
 					{item.source}
 				</Box>
 
-				{item.isPodcast && (
-					<Box
-						sx={{
-							display: "flex",
-							alignItems: "center",
-							gap: 0.5,
-							px: 1,
-							py: 0.25,
-							borderRadius: 1,
-							bgcolor: "rgba(168, 85, 247, 0.15)",
-							color: "#a855f7",
-							fontSize: "0.7rem",
-							fontWeight: 600,
-							textTransform: "uppercase",
-							letterSpacing: "0.5px",
-						}}
-					>
-						<HeadphonesIcon sx={{ fontSize: 12 }} />
-						Podcast
-					</Box>
-				)}
+				{item.isPodcast && <PodcastBadge />}
 
 				{item.isPodcast && item.duration && (
 					<Box
@@ -124,7 +113,9 @@ export default function FeedItem({ item }: FeedItemProps) {
 						fontSize: "1.1rem",
 						fontWeight: 600,
 						lineHeight: 1.4,
-						"&:hover": { color: item.isPodcast ? "#a855f7" : "primary.main" },
+						"&:hover": {
+							color: item.isPodcast ? PODCAST_ACCENT : "primary.main",
+						},
 					}}
 				>
 					{item.title}

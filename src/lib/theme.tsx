@@ -3,7 +3,16 @@
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Inter } from "next/font/google";
-import { createContext, type ReactNode, useEffect, useState } from "react";
+import {
+	createContext,
+	type ReactNode,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
+import { useLocalStorage } from "usehooks-ts";
+import type { AppMode } from "@/types";
 
 const inter = Inter({
 	weight: ["300", "400", "500", "600", "700"],
@@ -20,6 +29,40 @@ interface ColorModeContextValue {
 export const ColorModeContext = createContext<ColorModeContextValue>({
 	toggleColorMode: () => {},
 });
+
+interface ModeContextValue {
+	mode: AppMode;
+	setMode: (mode: AppMode) => void;
+}
+
+export const ModeContext = createContext<ModeContextValue>({
+	mode: "classic",
+	setMode: () => {},
+});
+
+export const useModeContext = () => useContext(ModeContext);
+
+export const PODCAST_ACCENT = "#a855f7";
+export const PODCAST_ACCENT_RGB = "168, 85, 247";
+
+const baseTheme = {
+	typography: {
+		fontFamily: inter.style.fontFamily,
+		button: { textTransform: "none" },
+	},
+	shape: {
+		borderRadius: 12,
+	},
+	components: {
+		MuiPaper: {
+			styleOverrides: {
+				root: {
+					backgroundImage: "none",
+				},
+			},
+		},
+	},
+};
 
 const getDesignTokens = (mode: Mode) => ({
 	palette: {
@@ -72,15 +115,14 @@ const getDesignTokens = (mode: Mode) => ({
 					divider: "rgba(0, 0, 0, 0.08)",
 				}),
 	},
+	shape: {
+		borderRadius: 16,
+	},
 	typography: {
-		fontFamily: inter.style.fontFamily,
 		h1: { fontWeight: 700, letterSpacing: "-0.025em" },
 		h2: { fontWeight: 600, letterSpacing: "-0.025em" },
 		h3: { fontWeight: 600, letterSpacing: "-0.025em" },
-		button: { textTransform: "none", fontWeight: 600 },
-	},
-	shape: {
-		borderRadius: 16,
+		button: { fontWeight: 600 },
 	},
 	components: {
 		MuiButton: {
@@ -123,16 +165,8 @@ const getDesignTokens = (mode: Mode) => ({
 		MuiCard: {
 			styleOverrides: {
 				root: {
-					backgroundImage: "none",
 					backgroundColor: mode === "dark" ? "#18181b" : "#ffffff",
 					border: `1px solid ${mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)"}`,
-				},
-			},
-		},
-		MuiPaper: {
-			styleOverrides: {
-				root: {
-					backgroundImage: "none",
 				},
 			},
 		},
@@ -170,36 +204,188 @@ const getDesignTokens = (mode: Mode) => ({
 	},
 });
 
+const getGmailDesignTokens = (mode: Mode) => ({
+	palette: {
+		mode,
+		primary: {
+			main: "#0b57d0",
+			light: "#eaf1fb",
+			dark: "#0842a0",
+			contrastText: "#ffffff",
+		},
+		background: {
+			default: mode === "dark" ? "#1a1c1e" : "#f6f8fc",
+			paper: mode === "dark" ? "#1e1e1e" : "#ffffff",
+		},
+		text: {
+			primary: mode === "dark" ? "#e3e2e6" : "#1f1f1f",
+			secondary: mode === "dark" ? "#c4c6d0" : "#444746",
+		},
+		divider: mode === "dark" ? "#444746" : "#e0e2e0",
+	},
+	shape: {
+		borderRadius: 12,
+	},
+	typography: {
+		button: { fontWeight: 500 },
+	},
+	components: {
+		MuiButton: {
+			styleOverrides: {
+				root: {
+					borderRadius: 24,
+				},
+			},
+		},
+		MuiListItemButton: {
+			styleOverrides: {
+				root: {
+					borderRadius: 24,
+					margin: "0 8px",
+					"&.Mui-selected": {
+						backgroundColor: mode === "dark" ? "#004a77" : "#c2e7ff",
+						color: mode === "dark" ? "#c2e7ff" : "#001d35",
+						"&:hover": {
+							backgroundColor: mode === "dark" ? "#004a77" : "#c2e7ff",
+						},
+						"& .MuiListItemIcon-root": {
+							color: mode === "dark" ? "#c2e7ff" : "#001d35",
+						},
+					},
+				},
+			},
+		},
+	},
+});
+
+const getTwitterDesignTokens = (mode: Mode) => ({
+	palette: {
+		mode,
+		primary: {
+			main: "#1d9bf0",
+			light: "#1d9bf026",
+			dark: "#1976d2",
+			contrastText: "#ffffff",
+		},
+		background: {
+			default: mode === "dark" ? "#000000" : "#ffffff",
+			paper: mode === "dark" ? "#16181c" : "#f7f9f9",
+		},
+		text: {
+			primary: mode === "dark" ? "#e7e9ea" : "#0f1419",
+			secondary: mode === "dark" ? "#71767b" : "#536471",
+		},
+		divider: mode === "dark" ? "#2f3336" : "#eff3f4",
+		grey: {
+			50: "#f9f9f9",
+			100: "#f0f0f0",
+			200: "#e0e0e0",
+			300: "#c4c4c4",
+			400: "#a3a3a3",
+			500: "#828282",
+			600: "#616161",
+			700: "#424242",
+			800: "#212121",
+			900: "#000000",
+		},
+	},
+	shape: {
+		borderRadius: 8,
+	},
+	typography: {
+		button: { fontWeight: 700 },
+		body2: {
+			fontSize: "0.875rem",
+		},
+		caption: {
+			fontSize: "0.75rem",
+		},
+	},
+	components: {
+		MuiButton: {
+			styleOverrides: {
+				root: {
+					borderRadius: 999,
+					fontWeight: 700,
+				},
+			},
+		},
+		MuiPaper: {
+			styleOverrides: {
+				root: {
+					border: `1px solid ${mode === "dark" ? "#2f3336" : "#eff3f4"}`,
+				},
+			},
+		},
+		MuiListItemButton: {
+			styleOverrides: {
+				root: {
+					borderRadius: 999,
+					"&:hover": {
+						backgroundColor: "rgba(29, 155, 240, 0.1)",
+					},
+				},
+			},
+		},
+		MuiAppBar: {
+			styleOverrides: {
+				root: {
+					backgroundImage: "none",
+				},
+			},
+		},
+	},
+});
+
 export default function ThemeRegistry({ children }: { children: ReactNode }) {
-	const [mode, setMode] = useState<Mode>("dark");
+	const [colorMode, setColorMode] = useState<Mode>("dark");
+	const [appMode, setAppMode] = useLocalStorage<AppMode>(
+		"focusFeedsMode",
+		"classic",
+	);
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
 			const savedMode = localStorage.getItem("themeMode") as Mode | null;
 			if (savedMode) {
-				setMode(savedMode);
+				setColorMode(savedMode);
 			}
 		}
 	}, []);
 
-	const colorMode: ColorModeContextValue = {
+	const colorModeContext: ColorModeContextValue = {
 		toggleColorMode: () => {
-			setMode((prevMode) => {
-				const newMode = prevMode === "light" ? "dark" : "light";
-				localStorage.setItem("themeMode", newMode);
-				return newMode;
+			setColorMode((prev) => {
+				const next = prev === "light" ? "dark" : "light";
+				localStorage.setItem("themeMode", next);
+				return next;
 			});
 		},
 	};
 
-	const theme = createTheme(getDesignTokens(mode));
+	const theme = useMemo(() => {
+		let modeTokens: Parameters<typeof createTheme>[0];
+		switch (appMode) {
+			case "gmail":
+				modeTokens = getGmailDesignTokens(colorMode);
+				break;
+			case "twitter":
+				modeTokens = getTwitterDesignTokens(colorMode);
+				break;
+			default:
+				modeTokens = getDesignTokens(colorMode);
+		}
+		return createTheme(baseTheme, modeTokens);
+	}, [appMode, colorMode]);
 
 	return (
-		<ColorModeContext.Provider value={colorMode}>
-			<ThemeProvider theme={theme}>
-				<CssBaseline />
-				{children}
-			</ThemeProvider>
-		</ColorModeContext.Provider>
+		<ModeContext.Provider value={{ mode: appMode, setMode: setAppMode }}>
+			<ColorModeContext.Provider value={colorModeContext}>
+				<ThemeProvider theme={theme}>
+					<CssBaseline />
+					{children}
+				</ThemeProvider>
+			</ColorModeContext.Provider>
+		</ModeContext.Provider>
 	);
 }

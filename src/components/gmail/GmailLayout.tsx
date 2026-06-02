@@ -106,7 +106,9 @@ export default function GmailLayout({
 						borderRadius: 4,
 						overflow: "hidden",
 						border: (theme) =>
-							theme.palette.mode === "dark" ? "none" : "1px solid #e0e2e0",
+							theme.palette.mode === "dark"
+								? "none"
+								: `1px solid ${theme.palette.divider}`,
 					}}
 				>
 					{selectedArticle ? (

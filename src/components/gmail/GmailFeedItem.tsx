@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
+import { PODCAST_ACCENT } from "@/lib/theme";
 import type { FeedItem } from "@/types";
 import { formatDate } from "../utils";
 
@@ -75,7 +76,9 @@ export default function GmailFeedItem({
 				}}
 			>
 				{item.isPodcast && (
-					<HeadphonesOutlinedIcon sx={{ fontSize: 16, color: "#a855f7" }} />
+					<HeadphonesOutlinedIcon
+						sx={{ fontSize: 16, color: PODCAST_ACCENT }}
+					/>
 				)}
 				<Typography
 					variant="body2"
