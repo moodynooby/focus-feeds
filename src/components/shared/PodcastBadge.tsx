@@ -1,7 +1,7 @@
 "use client";
 
-import HeadphonesIcon from "@mui/icons-material/Headphones";
 import Box from "@mui/material/Box";
+import { Headphones } from "lucide-react";
 import { PODCAST_ACCENT, PODCAST_ACCENT_RGB } from "@/lib/theme";
 
 interface PodcastBadgeProps {
@@ -26,7 +26,7 @@ export default function PodcastBadge({ iconSize = 12 }: PodcastBadgeProps) {
 				letterSpacing: "0.5px",
 			}}
 		>
-			<HeadphonesIcon sx={{ fontSize: iconSize }} />
+			<Headphones size={iconSize} />
 			Podcast
 		</Box>
 	);

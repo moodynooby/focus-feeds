@@ -1,9 +1,9 @@
 "use client";
 
-import WifiOffIcon from "@mui/icons-material/WifiOff";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import type { SxProps, Theme } from "@mui/material/styles";
+import { WifiOff } from "lucide-react";
 
 interface OfflineBannerProps {
 	variant?: "inline" | "fixed";
@@ -17,7 +17,7 @@ export default function OfflineBanner({
 	return (
 		<Alert
 			severity="warning"
-			icon={<WifiOffIcon />}
+			icon={<WifiOff size={24} />}
 			sx={{
 				borderRadius: 0,
 				m: 0,

@@ -1,11 +1,10 @@
 "use client";
 
-import AddIcon from "@mui/icons-material/Add";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import { ChevronDown, Plus } from "lucide-react";
 import { useState } from "react";
 
 interface SourceFilterProps {
@@ -57,8 +56,8 @@ export default function SourceFilter({
 				<>
 					<Button
 						size="small"
-						startIcon={<AddIcon />}
-						endIcon={<KeyboardArrowDownIcon />}
+						startIcon={<Plus size={20} />}
+						endIcon={<ChevronDown size={20} />}
 						onClick={(e) => setAnchorEl(e.currentTarget)}
 						sx={{ minWidth: 0, px: 1 }}
 					>

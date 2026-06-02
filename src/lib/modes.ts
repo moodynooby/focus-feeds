@@ -1,12 +1,10 @@
-import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
-import MailIcon from "@mui/icons-material/Mail";
-import TagIcon from "@mui/icons-material/Tag";
-import type { ElementType } from "react";
+import type { LucideIcon } from "lucide-react";
+import { Hash, Mail, Sparkles } from "lucide-react";
 import type { AppMode } from "@/types";
 
 interface ModeConfig {
 	name: string;
-	icon: ElementType;
+	icon: LucideIcon;
 	hasSidebar: boolean;
 	hasInlineArticleView: boolean;
 	hasStarring: boolean;
@@ -15,21 +13,21 @@ interface ModeConfig {
 export const MODE_CONFIG: Record<AppMode, ModeConfig> = {
 	classic: {
 		name: "Classic",
-		icon: AutoFixHighIcon,
+		icon: Sparkles,
 		hasSidebar: false,
 		hasInlineArticleView: false,
 		hasStarring: false,
 	},
 	gmail: {
 		name: "Gmail",
-		icon: MailIcon,
+		icon: Mail,
 		hasSidebar: true,
 		hasInlineArticleView: true,
 		hasStarring: true,
 	},
 	twitter: {
 		name: "Twitter",
-		icon: TagIcon,
+		icon: Hash,
 		hasSidebar: false,
 		hasInlineArticleView: false,
 		hasStarring: false,

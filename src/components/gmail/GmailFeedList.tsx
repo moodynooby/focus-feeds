@@ -1,14 +1,16 @@
 "use client";
 
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import RefreshIcon from "@mui/icons-material/Refresh";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
+import {
+	ChevronLeft,
+	ChevronRight,
+	MoreVertical,
+	RefreshCw,
+} from "lucide-react";
 import { useMemo } from "react";
 import type { FeedItem } from "@/types";
 import EmptyState from "../EmptyState";
@@ -41,20 +43,20 @@ export default function GmailFeedList({
 			<Box sx={{ p: 1, display: "flex", alignItems: "center", gap: 1 }}>
 				<Checkbox size="small" />
 				<IconButton size="small" onClick={onRefresh}>
-					<RefreshIcon fontSize="small" />
+					<RefreshCw size={20} />
 				</IconButton>
 				<IconButton size="small">
-					<MoreVertIcon fontSize="small" />
+					<MoreVertical size={20} />
 				</IconButton>
 				<Box sx={{ flex: 1 }} />
 				<Typography variant="caption" color="text.secondary">
 					{items.length > 0 ? `1-${items.length}` : "0"} of {items.length}
 				</Typography>
 				<IconButton size="small">
-					<ChevronLeftIcon fontSize="small" />
+					<ChevronLeft size={20} />
 				</IconButton>
 				<IconButton size="small">
-					<ChevronRightIcon fontSize="small" />
+					<ChevronRight size={20} />
 				</IconButton>
 			</Box>
 			<Divider />

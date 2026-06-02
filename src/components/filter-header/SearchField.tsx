@@ -1,10 +1,9 @@
 "use client";
 
-import CloseIcon from "@mui/icons-material/Close";
-import SearchIcon from "@mui/icons-material/Search";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
+import { Search, X } from "lucide-react";
 
 interface SearchFieldProps {
 	value: string;
@@ -29,7 +28,7 @@ export default function SearchField({
 				input: {
 					startAdornment: (
 						<InputAdornment position="start">
-							<SearchIcon fontSize="small" sx={{ color: "text.secondary" }} />
+							<Search size={20} />
 						</InputAdornment>
 					),
 					endAdornment: value && (
@@ -39,7 +38,7 @@ export default function SearchField({
 								onClick={() => onChange("")}
 								sx={{ color: "text.secondary" }}
 							>
-								<CloseIcon fontSize="small" />
+								<X size={20} />
 							</IconButton>
 						</InputAdornment>
 					),

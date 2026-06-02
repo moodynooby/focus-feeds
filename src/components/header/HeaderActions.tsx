@@ -1,11 +1,9 @@
 "use client";
 
-import FilterListOffIcon from "@mui/icons-material/FilterListOff";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import SettingsIcon from "@mui/icons-material/Settings";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
+import { FilterX, RefreshCw, Settings } from "lucide-react";
 import ColorModeToggle from "./ColorModeToggle";
 import ModeMenu from "./ModeMenu";
 
@@ -33,7 +31,7 @@ export default function HeaderActions({
 						size="small"
 						sx={{ color: "text.secondary" }}
 					>
-						<FilterListOffIcon fontSize="small" />
+						<FilterX size={20} />
 					</IconButton>
 				</Tooltip>
 			)}
@@ -52,7 +50,7 @@ export default function HeaderActions({
 							},
 						}}
 					>
-						<RefreshIcon fontSize="small" />
+						<RefreshCw size={20} />
 					</IconButton>
 				</span>
 			</Tooltip>
@@ -62,7 +60,7 @@ export default function HeaderActions({
 					size="small"
 					sx={{ color: "text.secondary" }}
 				>
-					<SettingsIcon fontSize="small" />
+					<Settings size={20} />
 				</IconButton>
 			</Tooltip>
 		</Box>

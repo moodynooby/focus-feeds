@@ -1,11 +1,5 @@
 "use client";
 
-import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
-import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
-import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
-import MarkEmailUnreadOutlinedIcon from "@mui/icons-material/MarkEmailUnreadOutlined";
-import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
-import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
@@ -13,6 +7,14 @@ import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import DOMPurify from "isomorphic-dompurify";
+import {
+	Archive,
+	ArrowLeft,
+	ExternalLink,
+	MailOpen,
+	MoreVertical,
+	Trash2,
+} from "lucide-react";
 import type { FeedItem } from "@/types";
 import PodcastPlayer from "../PodcastPlayer";
 import RSSContent from "../RSSContent";
@@ -43,26 +45,26 @@ export default function GmailArticleView({
 			<Box sx={{ p: 1, display: "flex", alignItems: "center", gap: 1 }}>
 				<Tooltip title="Back to Inbox">
 					<IconButton onClick={onBack}>
-						<ArrowBackOutlinedIcon />
+						<ArrowLeft size={24} />
 					</IconButton>
 				</Tooltip>
 				<IconButton>
-					<ArchiveOutlinedIcon fontSize="small" />
+					<Archive size={20} />
 				</IconButton>
 				<IconButton>
-					<DeleteOutlinedIcon fontSize="small" />
+					<Trash2 size={20} />
 				</IconButton>
 				<IconButton>
-					<MarkEmailUnreadOutlinedIcon fontSize="small" />
+					<MailOpen size={20} />
 				</IconButton>
 				<Box sx={{ flex: 1 }} />
 				<Tooltip title="Open original">
 					<IconButton component="a" href={item.link} target="_blank">
-						<OpenInNewOutlinedIcon fontSize="small" />
+						<ExternalLink size={20} />
 					</IconButton>
 				</Tooltip>
 				<IconButton>
-					<MoreVertOutlinedIcon fontSize="small" />
+					<MoreVertical size={20} />
 				</IconButton>
 			</Box>
 			<Divider />
