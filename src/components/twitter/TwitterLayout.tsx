@@ -2,13 +2,13 @@
 
 import Box from "@mui/material/Box";
 import { ThemeProvider } from "@mui/material/styles";
-import type { FailedFeed, FeedItem } from "@/types";
+import { twitterTheme } from "@/lib/twitter-theme";
+import type { FeedItem } from "@/types";
 import EmptyState from "../EmptyState";
 import FilterHeader from "../filter-header/FilterHeader";
 import OfflineBanner from "../shared/OfflineBanner";
 import SkeletonList from "../shared/SkeletonList";
 import TwitterFeedItem from "./TwitterFeedItem";
-import { twitterTheme } from "@/lib/twitter-theme";
 
 interface TwitterLayoutProps {
 	searchQuery: string;
@@ -24,7 +24,6 @@ interface TwitterLayoutProps {
 	filteredCount?: number;
 	totalCount?: number;
 	error?: string;
-	failedFeeds?: FailedFeed[] | null;
 	hasMoreItems?: boolean;
 	onLoadMore?: () => void;
 	isOnline?: boolean;
@@ -44,7 +43,6 @@ export default function TwitterLayout({
 	filteredCount,
 	totalCount,
 	error,
-	failedFeeds,
 	hasMoreItems,
 	onLoadMore,
 	isOnline = true,
@@ -84,18 +82,18 @@ export default function TwitterLayout({
 					}}
 				>
 					{loading && items.length === 0 ? (
-						<SkeletonList count={10} />
+						<SkeletonList rows={10} />
 					) : error ? (
 						<EmptyState
-							title="Error loading feeds"
-							subtitle={error}
-							onRetry={onRefresh}
+							message="Error loading feeds"
+							actionLabel={error ? "Retry" : undefined}
+							onAction={onRefresh}
 						/>
 					) : items.length === 0 ? (
 						<EmptyState
-							title="No articles found"
-							subtitle="Try adjusting your filters or adding new feeds"
-							onRetry={onRefresh}
+							message="No articles found"
+							actionLabel="Adjust filters"
+							onAction={onRefresh}
 						/>
 					) : (
 						<>
@@ -129,7 +127,6 @@ export default function TwitterLayout({
 										}}
 									>
 										Show more
-										</Box>
 									</Box>
 								</Box>
 							)}

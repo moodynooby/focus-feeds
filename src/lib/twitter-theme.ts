@@ -1,6 +1,6 @@
 import { createTheme, type ThemeOptions } from "@mui/material/styles";
 
-const getTwitterDesignTokens = (mode: "light" | "dark"): ThemeOptions => ({
+const getTwitterDesignTokens = (_mode: "light" | "dark"): ThemeOptions => ({
 	palette: {
 		mode: "dark", // Twitter/X is always dark mode
 		primary: {
@@ -35,7 +35,8 @@ const getTwitterDesignTokens = (mode: "light" | "dark"): ThemeOptions => ({
 		borderRadius: 8,
 	},
 	typography: {
-		fontFamily: "Inter, Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+		fontFamily:
+			"Inter, Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
 		button: {
 			textTransform: "none",
 			fontWeight: 700,

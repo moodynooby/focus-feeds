@@ -7,8 +7,8 @@ import useSWR from "swr";
 import { useLocalStorage } from "usehooks-ts";
 import ClassicLayout from "@/components/ClassicLayout";
 import GmailLayout from "@/components/gmail/GmailLayout";
-import TwitterLayout from "@/components/twitter/TwitterLayout";
 import SettingsDrawer from "@/components/SettingsDrawer";
+import TwitterLayout from "@/components/twitter/TwitterLayout";
 import useAuth from "@/hooks/useAuth";
 import useFeedFilters from "@/hooks/useFeedFilters";
 import useFeedSync from "@/hooks/useFeedSync";
@@ -24,186 +24,185 @@ import { addUserFeed, fetchFeeds, removeUserFeed } from "./actions";
 const ITEMS_PER_BATCH = 20;
 
 export default function FeedManager() {
-    useServiceWorker();
-    const { status, signOut } = useAuth();
-    const isOnline = useOnlineStatus();
-    const { deferredPrompt, installStatus, handleInstallClick } = usePWAInstall();
-    const { starredItems, toggleStar, view, setView } = useStarredItems();
+	useServiceWorker();
+	const { status, signOut } = useAuth();
+	const isOnline = useOnlineStatus();
+	const { deferredPrompt, installStatus, handleInstallClick } = usePWAInstall();
+	const { starredItems, toggleStar, view, setView } = useStarredItems();
 
-    const [drawerOpen, setDrawerOpen] = useState(false);
-    const [urls, setUrls] = useLocalStorage<string[]>("focusFeedsUrls", []);
-    const [duration, setDuration] = useLocalStorage<string>(
-        "focusFeedsDuration",
-        "week",
-    );
-    const [mode, setMode] = useLocalStorage<AppMode>("focusFeedsMode", "classic");
+	const [drawerOpen, setDrawerOpen] = useState(false);
+	const [urls, setUrls] = useLocalStorage<string[]>("focusFeedsUrls", []);
+	const [duration, setDuration] = useLocalStorage<string>(
+		"focusFeedsDuration",
+		"week",
+	);
+	const [mode, setMode] = useLocalStorage<AppMode>("focusFeedsMode", "classic");
 
-    const { data, error, isLoading, mutate } = useSWR(
-        urls.length > 0 ? [urls, duration] : null,
-        async ([urls, duration]: [string[], string]) => {
-            const result = await fetchFeeds(urls, duration as FeedDuration);
-            if (!result.success) {
-                throw new Error(result.error || "Failed to fetch feeds");
-            }
-            return result;
-        },
-        {
-            refreshInterval: 5 * 60 * 1000,
-            revalidateOnFocus: true,
-            dedupingInterval: 2000,
-        },
-    );
+	const { data, error, isLoading, mutate } = useSWR(
+		urls.length > 0 ? [urls, duration] : null,
+		async ([urls, duration]: [string[], string]) => {
+			const result = await fetchFeeds(urls, duration as FeedDuration);
+			if (!result.success) {
+				throw new Error(result.error || "Failed to fetch feeds");
+			}
+			return result;
+		},
+		{
+			refreshInterval: 5 * 60 * 1000,
+			revalidateOnFocus: true,
+			dedupingInterval: 2000,
+		},
+	);
 
-    const items: FeedItem[] = data?.items ?? [];
-    const failedFeeds = data?.failedFeeds ?? null;
-    const lastRefresh = data?.timestamp ? new Date(data.timestamp) : null;
+	const items: FeedItem[] = data?.items ?? [];
+	const failedFeeds = data?.failedFeeds ?? null;
+	const lastRefresh = data?.timestamp ? new Date(data.timestamp) : null;
 
-    useEffect(() => {
-        if (status !== "loading" && urls.length === 0) {
-            setUrls([
-                "https://hnrss.org/frontpage",
-                "https://feeds.megaphone.fm/vergecast",
-            ]);
-        }
-    }, [status, urls.length, setUrls]);
+	useEffect(() => {
+		if (status !== "loading" && urls.length === 0) {
+			setUrls([
+				"https://hnrss.org/frontpage",
+				"https://feeds.megaphone.fm/vergecast",
+			]);
+		}
+	}, [status, urls.length, setUrls]);
 
-    const { syncStatus } = useFeedSync(status, urls, setUrls);
+	const { syncStatus } = useFeedSync(status, urls, setUrls);
 
-    const filters = useFeedFilters(items, ITEMS_PER_BATCH, {
-        starredItems,
-        view,
-    });
+	const filters = useFeedFilters(items, ITEMS_PER_BATCH, {
+		starredItems,
+		view,
+	});
 
-    const handleAdd = async (newUrl: string) => {
-        if (newUrl && !urls.includes(newUrl)) {
-            setUrls((prev) => [...prev, newUrl]);
+	const handleAdd = async (newUrl: string) => {
+		if (newUrl && !urls.includes(newUrl)) {
+			setUrls((prev) => [...prev, newUrl]);
 
-            if (status === "authenticated") {
-                const result = await addUserFeed(newUrl);
-                if (!result.success) {
-                    console.error("Failed to add feed remotely");
-                }
-            }
-        }
-    };
+			if (status === "authenticated") {
+				const result = await addUserFeed(newUrl);
+				if (!result.success) {
+					console.error("Failed to add feed remotely");
+				}
+			}
+		}
+	};
 
-    const handleRemove = async (urlToRemove: string) => {
-        setUrls((prev) => prev.filter((url) => url !== urlToRemove));
+	const handleRemove = async (urlToRemove: string) => {
+		setUrls((prev) => prev.filter((url) => url !== urlToRemove));
 
-        if (status === "authenticated") {
-            const result = await removeUserFeed(urlToRemove);
-            if (!result.success) {
-                console.error("Failed to remove feed remotely");
-            }
-        }
-    };
+		if (status === "authenticated") {
+			const result = await removeUserFeed(urlToRemove);
+			if (!result.success) {
+				console.error("Failed to remove feed remotely");
+			}
+		}
+	};
 
-    const refresh = () => mutate(undefined, { revalidate: true });
+	const refresh = () => mutate(undefined, { revalidate: true });
 
-    const theme = useTheme();
-    const currentMode = MODE_CONFIG[mode] || MODE_CONFIG.classic;
-    const nextMode = currentMode.nextMode;
-    const nextConfig = MODE_CONFIG[nextMode as keyof typeof MODE_CONFIG];
+	const theme = useTheme();
+	const currentMode = MODE_CONFIG[mode] || MODE_CONFIG.classic;
+	const nextMode = currentMode.nextMode;
+	const nextConfig = MODE_CONFIG[nextMode as keyof typeof MODE_CONFIG];
 
-    const content =
-        mode === "gmail" ? (
-            <ThemeProvider theme={gmailTheme(theme.palette.mode)}>
-                <GmailLayout
-                    searchQuery={filters.searchQuery}
-                    onSearchChange={filters.setSearchQuery}
-                    sources={filters.sources}
-                    selectedSources={filters.selectedSources}
-                    onSourcesChange={filters.setSelectedSources}
-                    items={filters.filteredItems}
-                    starredItems={starredItems}
-                    onToggleStar={toggleStar}
-                    onOpenSettings={() => setDrawerOpen(true)}
-                    onSignOut={signOut}
-                    status={status}
-                    loading={isLoading}
-                    onAddFeed={() => setDrawerOpen(true)}
-                    view={view}
-                    onViewChange={setView}
-                    onRefresh={refresh}
-                    isOnline={isOnline}
-                />
-            </ThemeProvider>
-        ) : mode === "twitter" ? (
-            <TwitterLayout
-                searchQuery={filters.searchQuery}
-                onSearchChange={filters.setSearchQuery}
-                sources={filters.sources}
-                selectedSources={filters.selectedSources}
-                onSourcesChange={filters.setSelectedSources}
-                items={filters.visibleItems}
-                loading={isLoading}
-                onRefresh={refresh}
-                onOpenSettings={() => setDrawerOpen(true)}
-                onClearFilters={filters.clearFilters}
-                filteredCount={filters.filteredItems.length}
-                totalCount={items.length}
-                error={error?.message}
-                failedFeeds={failedFeeds}
-                hasMoreItems={filters.hasMoreItems}
-                onLoadMore={filters.loadMore}
-                isOnline={isOnline}
-            />
-        ) : (
-            <ClassicLayout
-                searchQuery={filters.searchQuery}
-                onSearchChange={filters.setSearchQuery}
-                sources={filters.sources}
-                selectedSources={filters.selectedSources}
-                onSourcesChange={filters.setSelectedSources}
-                items={filters.visibleItems}
-                loading={isLoading}
-                onRefresh={refresh}
-                onOpenSettings={() => setDrawerOpen(true)}
-                onClearFilters={filters.clearFilters}
-                filteredCount={filters.filteredItems.length}
-                totalCount={items.length}
-                error={error?.message}
-                failedFeeds={failedFeeds}
-                hasMoreItems={filters.hasMoreItems}
-                onLoadMore={filters.loadMore}
-                isOnline={isOnline}
-            />
-        );
+	const content =
+		mode === "gmail" ? (
+			<ThemeProvider theme={gmailTheme(theme.palette.mode)}>
+				<GmailLayout
+					searchQuery={filters.searchQuery}
+					onSearchChange={filters.setSearchQuery}
+					sources={filters.sources}
+					selectedSources={filters.selectedSources}
+					onSourcesChange={filters.setSelectedSources}
+					items={filters.filteredItems}
+					starredItems={starredItems}
+					onToggleStar={toggleStar}
+					onOpenSettings={() => setDrawerOpen(true)}
+					onSignOut={signOut}
+					status={status}
+					loading={isLoading}
+					onAddFeed={() => setDrawerOpen(true)}
+					view={view}
+					onViewChange={setView}
+					onRefresh={refresh}
+					isOnline={isOnline}
+				/>
+			</ThemeProvider>
+		) : mode === "twitter" ? (
+			<TwitterLayout
+				searchQuery={filters.searchQuery}
+				onSearchChange={filters.setSearchQuery}
+				sources={filters.sources}
+				selectedSources={filters.selectedSources}
+				onSourcesChange={filters.setSelectedSources}
+				items={filters.visibleItems}
+				loading={isLoading}
+				onRefresh={refresh}
+				onOpenSettings={() => setDrawerOpen(true)}
+				onClearFilters={filters.clearFilters}
+				filteredCount={filters.filteredItems.length}
+				totalCount={items.length}
+				error={error?.message}
+				hasMoreItems={filters.hasMoreItems}
+				onLoadMore={filters.loadMore}
+				isOnline={isOnline}
+			/>
+		) : (
+			<ClassicLayout
+				failedFeeds={failedFeeds}
+				searchQuery={filters.searchQuery}
+				onSearchChange={filters.setSearchQuery}
+				sources={filters.sources}
+				selectedSources={filters.selectedSources}
+				onSourcesChange={filters.setSelectedSources}
+				items={filters.visibleItems}
+				loading={isLoading}
+				onRefresh={refresh}
+				onOpenSettings={() => setDrawerOpen(true)}
+				onClearFilters={filters.clearFilters}
+				filteredCount={filters.filteredItems.length}
+				totalCount={items.length}
+				error={error?.message}
+				hasMoreItems={filters.hasMoreItems}
+				onLoadMore={filters.loadMore}
+				isOnline={isOnline}
+			/>
+		);
 
-    return (
-        <>
-            {content}
+	return (
+		<>
+			{content}
 
-            <Tooltip title={nextConfig.fabTooltip}>
-                <Fab
-                    color="primary"
-                    aria-label={nextConfig.fabAriaLabel}
-                    onClick={() => setMode(nextMode as AppMode)}
-                    sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 2000 }}
-                >
-                    <nextConfig.icon />
-                </Fab>
-            </Tooltip>
+			<Tooltip title={nextConfig.fabTooltip}>
+				<Fab
+					color="primary"
+					aria-label={nextConfig.fabAriaLabel}
+					onClick={() => setMode(nextMode as AppMode)}
+					sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 2000 }}
+				>
+					<nextConfig.icon />
+				</Fab>
+			</Tooltip>
 
-            <SettingsDrawer
-                open={drawerOpen}
-                onClose={() => setDrawerOpen(false)}
-                urls={urls}
-                onAdd={handleAdd}
-                onRemove={handleRemove}
-                itemsCount={items.length}
-                lastRefresh={lastRefresh}
-                onRefresh={refresh}
-                onClearCache={refresh}
-                duration={duration}
-                onDurationChange={setDuration}
-                syncStatus={syncStatus}
-                status={status}
-                onSignOut={signOut}
-                deferredPrompt={deferredPrompt}
-                onInstall={handleInstallClick}
-                installStatus={installStatus}
-            />
-        </>
-    );
+			<SettingsDrawer
+				open={drawerOpen}
+				onClose={() => setDrawerOpen(false)}
+				urls={urls}
+				onAdd={handleAdd}
+				onRemove={handleRemove}
+				itemsCount={items.length}
+				lastRefresh={lastRefresh}
+				onRefresh={refresh}
+				onClearCache={refresh}
+				duration={duration}
+				onDurationChange={setDuration}
+				syncStatus={syncStatus}
+				status={status}
+				onSignOut={signOut}
+				deferredPrompt={deferredPrompt}
+				onInstall={handleInstallClick}
+				installStatus={installStatus}
+			/>
+		</>
+	);
 }
