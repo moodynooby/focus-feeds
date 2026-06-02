@@ -8,14 +8,14 @@ import MenuItem from "@mui/material/MenuItem";
 import { useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { Menu as MenuIcon } from "lucide-react";
+import { Inbox, Menu as MenuIcon, Star } from "lucide-react";
 import { useState } from "react";
 import type { AuthStatus, FeedItem, ViewMode } from "@/types";
+import FeedSidebar from "../feed-sidebar/FeedSidebar";
 import AppHeader from "../header/AppHeader";
 import OfflineBanner from "../shared/OfflineBanner";
 import GmailArticleView from "./GmailArticleView";
 import GmailFeedList from "./GmailFeedList";
-import GmailSidebar from "./GmailSidebar";
 
 interface GmailLayoutProps {
 	searchQuery: string;
@@ -67,6 +67,11 @@ export default function GmailLayout({
 	const handleOpenProfile = (event: React.MouseEvent<HTMLElement>) =>
 		setAnchorElProfile(event.currentTarget);
 	const handleCloseProfile = () => setAnchorElProfile(null);
+
+	const navItems = [
+		{ id: "inbox", label: "Inbox", icon: <Inbox size={20} /> },
+		{ id: "starred", label: "Starred", icon: <Star size={20} /> },
+	];
 
 	const rightSlot = (
 		<>
@@ -138,20 +143,22 @@ export default function GmailLayout({
 				}
 				rightSlot={rightSlot}
 			/>
-			<GmailSidebar
+			<FeedSidebar
 				open={sidebarOpen}
 				onClose={() => setSidebarOpen(false)}
-				sources={sources}
-				selectedSources={selectedSources}
-				onSourcesChange={onSourcesChange}
-				view={view}
-				onViewChange={(v) => {
-					onViewChange(v);
+				isMobile={isMobile}
+				navItems={navItems}
+				activeNav={view}
+				onNavChange={(id) => {
+					onViewChange(id as ViewMode);
 					setSelectedArticle(null);
 					if (isMobile) setSidebarOpen(false);
 				}}
+				sources={sources}
+				selectedSources={selectedSources}
+				onSourcesChange={onSourcesChange}
 				onAddFeed={onAddFeed}
-				isMobile={isMobile}
+				sourceSectionLabel="Labels"
 			/>
 			<Box
 				component="main"

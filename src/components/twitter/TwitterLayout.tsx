@@ -2,9 +2,14 @@
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { Home, Menu as MenuIcon } from "lucide-react";
+import { useState } from "react";
 import type { FeedItem } from "@/types";
 import EmptyState from "../EmptyState";
-import SourceFilter from "../filter-header/SourceFilter";
+import FeedSidebar from "../feed-sidebar/FeedSidebar";
 import AppHeader from "../header/AppHeader";
 import OfflineBanner from "../shared/OfflineBanner";
 import SkeletonList from "../shared/SkeletonList";
@@ -47,84 +52,126 @@ export default function TwitterLayout({
 	onLoadMore,
 	isOnline = true,
 }: TwitterLayoutProps) {
+	const theme = useTheme();
+	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+	const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+	const [activeNav, setActiveNav] = useState("home");
+
+	const navItems = [{ id: "home", label: "Home", icon: <Home size={20} /> }];
+
 	return (
 		<Box
 			sx={{
-				minHeight: "100vh",
-				bgcolor: "background.default",
-				color: "text.primary",
+				display: "flex",
+				height: "100vh",
+				overflow: "hidden",
+				pt: "64px",
 			}}
 		>
-			{!isOnline && <OfflineBanner />}
+			{!isOnline && <OfflineBanner variant="fixed" />}
 
 			<AppHeader
-				searchQuery={searchQuery}
-				onSearchChange={onSearchChange}
-				sourceFilter={
-					<SourceFilter
-						sources={sources}
-						selectedSources={selectedSources}
-						onChange={onSourcesChange}
-					/>
-				}
+				fixed
 				onRefresh={onRefresh}
 				onOpenSettings={onOpenSettings}
 				onClearFilters={onClearFilters}
 				filteredCount={filteredCount}
 				totalCount={totalCount}
 				loading={loading}
+				leftSlot={
+					<IconButton
+						edge="start"
+						color="inherit"
+						onClick={() => setSidebarOpen(!sidebarOpen)}
+					>
+						<MenuIcon size={24} />
+					</IconButton>
+				}
+			/>
+
+			<FeedSidebar
+				open={sidebarOpen}
+				onClose={() => setSidebarOpen(false)}
+				isMobile={isMobile}
+				searchQuery={searchQuery}
+				onSearchChange={onSearchChange}
+				navItems={navItems}
+				activeNav={activeNav}
+				onNavChange={(id) => {
+					setActiveNav(id);
+					if (id === "home") {
+						onClearFilters();
+					}
+					if (isMobile) setSidebarOpen(false);
+				}}
+				showModeSwitcher
+				sources={sources}
+				selectedSources={selectedSources}
+				onSourcesChange={onSourcesChange}
+				sourceSectionLabel="Accounts you follow"
 			/>
 
 			<Box
+				component="main"
 				sx={{
-					maxWidth: "600px",
-					mx: "auto",
-					pb: 4,
-					pt: 2,
-					px: 2,
+					flexGrow: 1,
+					height: "100%",
+					overflow: "auto",
+					display: "flex",
+					justifyContent: "center",
 				}}
 			>
-				{loading && items.length === 0 ? (
-					<SkeletonList rows={10} />
-				) : error ? (
-					<EmptyState
-						message="Error loading feeds"
-						actionLabel={error ? "Retry" : undefined}
-						onAction={onRefresh}
-					/>
-				) : items.length === 0 ? (
-					<EmptyState
-						message="No articles found"
-						actionLabel="Adjust filters"
-						onAction={onRefresh}
-					/>
-				) : (
-					<>
-						{items.map((item) => (
-							<TwitterFeedItem key={item.guid || item.link} item={item} />
-						))}
+				<Box
+					sx={{
+						maxWidth: "600px",
+						width: "100%",
+						pb: 4,
+						pt: 2,
+						px: 2,
+					}}
+				>
+					{loading && items.length === 0 ? (
+						<SkeletonList rows={10} />
+					) : error ? (
+						<EmptyState
+							message="Error loading feeds"
+							actionLabel={error ? "Retry" : undefined}
+							onAction={onRefresh}
+						/>
+					) : items.length === 0 ? (
+						<EmptyState
+							message="No articles found"
+							actionLabel="Adjust filters"
+							onAction={onRefresh}
+						/>
+					) : (
+						<>
+							{items.map((item) => (
+								<TwitterFeedItem key={item.guid || item.link} item={item} />
+							))}
 
-						{hasMoreItems && (
-							<Box
-								sx={{
-									textAlign: "center",
-									py: 3,
-								}}
-							>
-								<Button
-									variant="outlined"
-									onClick={onLoadMore}
+							{hasMoreItems && (
+								<Box
 									sx={{
-										borderRadius: 999,
-										fontWeight: 700,
+										textAlign: "center",
+										py: 3,
 									}}
 								>
-									Show more
-								</Button>
-							</Box>
-						)}
-					</>
-				)}
+									<Button
+										variant="outlined"
+										onClick={onLoadMore}
+										sx={{
+											borderRadius: 999,
+											fontWeight: 700,
+										}}
+									>
+										Show more
+									</Button>
+								</Box>
+							)}
+						</>
+					)}
+				</Box>
 			</Box>
 		</Box>
 	);

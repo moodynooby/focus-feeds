@@ -28,7 +28,7 @@ export const MODE_CONFIG: Record<AppMode, ModeConfig> = {
 	twitter: {
 		name: "Twitter",
 		icon: Hash,
-		hasSidebar: false,
+		hasSidebar: true,
 		hasInlineArticleView: false,
 		hasStarring: false,
 	},

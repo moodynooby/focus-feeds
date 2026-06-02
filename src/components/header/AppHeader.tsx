@@ -13,6 +13,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { ChevronUp, ListFilter, MoreVertical } from "lucide-react";
 import { useState } from "react";
+import { useModeContext } from "@/lib/theme";
 import SearchField from "../filter-header/SearchField";
 import ColorModeToggle from "./ColorModeToggle";
 import HeaderActions from "./HeaderActions";
@@ -20,8 +21,8 @@ import ModeMenu from "./ModeMenu";
 
 interface AppHeaderProps {
 	title?: string;
-	searchQuery: string;
-	onSearchChange: (value: string) => void;
+	searchQuery?: string;
+	onSearchChange?: (value: string) => void;
 	sourceFilter?: React.ReactNode;
 	onRefresh: () => void;
 	onOpenSettings: () => void;
@@ -51,10 +52,11 @@ export default function AppHeader({
 	mobileExtraItems,
 	fixed = false,
 }: AppHeaderProps) {
+	const { mode } = useModeContext();
 	const [mobileExpanded, setMobileExpanded] = useState(false);
 	const [anchorElMenu, setAnchorElMenu] = useState<HTMLElement | null>(null);
 
-	const hasActiveFilters = Boolean(searchQuery);
+	const hasActiveFilters = Boolean(searchQuery && searchQuery.length > 0);
 
 	const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
 		setAnchorElMenu(event.currentTarget);
@@ -110,30 +112,32 @@ export default function AppHeader({
 					)}
 				</Box>
 
-				<Box
-					sx={{
-						display: "flex",
-						alignItems: "center",
-						gap: 2,
-						flex: 1,
-						maxWidth: 800,
-						justifyContent: "center",
-					}}
-				>
-					<SearchField value={searchQuery} onChange={onSearchChange} />
-					{sourceFilter && (
-						<Box
-							sx={{
-								display: "flex",
-								alignItems: "center",
-								gap: 0.75,
-								flexWrap: "wrap",
-							}}
-						>
-							{sourceFilter}
-						</Box>
-					)}
-				</Box>
+				{searchQuery !== undefined && onSearchChange && (
+					<Box
+						sx={{
+							display: "flex",
+							alignItems: "center",
+							gap: 2,
+							flex: 1,
+							maxWidth: 800,
+							justifyContent: "center",
+						}}
+					>
+						<SearchField value={searchQuery} onChange={onSearchChange} />
+						{sourceFilter && (
+							<Box
+								sx={{
+									display: "flex",
+									alignItems: "center",
+									gap: 0.75,
+									flexWrap: "wrap",
+								}}
+							>
+								{sourceFilter}
+							</Box>
+						)}
+					</Box>
+				)}
 
 				<Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
 					<HeaderActions
@@ -177,7 +181,7 @@ export default function AppHeader({
 				</Box>
 
 				<Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-					<ModeMenu />
+					{mode !== "twitter" && <ModeMenu />}
 					<ColorModeToggle />
 					{sourceFilter && (
 						<Tooltip title={mobileExpanded ? "Hide filters" : "Show filters"}>
@@ -250,11 +254,13 @@ export default function AppHeader({
 							}}
 						>
 							<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-								<SearchField
-									value={searchQuery}
-									onChange={onSearchChange}
-									fullWidth
-								/>
+								{searchQuery !== undefined && onSearchChange && (
+									<SearchField
+										value={searchQuery}
+										onChange={onSearchChange}
+										fullWidth
+									/>
+								)}
 								{sourceFilter}
 							</Box>
 						</Paper>
