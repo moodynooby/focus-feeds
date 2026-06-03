@@ -2,17 +2,19 @@
 
 import { revalidatePath, unstable_cache } from "next/cache";
 import Parser from "rss-parser";
-import { sql } from "@/lib/db";
 import {
 	clearSession,
 	getCurrentUser,
 	getOrCreateUser,
 	setSession,
-} from "@/lib/simple-auth";
+} from "@/features/auth/lib/simple-auth";
+import { sql } from "@/lib/db";
 import type {
 	AuthResult,
 	CheckAuthResult,
+	FailedFeed,
 	FeedDuration,
+	FeedItem,
 	FetchFeedsResult,
 	SimpleAuthResult,
 	SyncFeedsResult,
@@ -94,21 +96,8 @@ async function fetchFeedsInternal(
 			urls.map((url) => fetchFeedWithRetry(parser, url)),
 		);
 
-		const allItems: Array<{
-			title: string;
-			link: string;
-			pubDate: string;
-			content: string;
-			contentSnippet: string;
-			guid: string;
-			source: string;
-			feedUrl: string;
-			isPodcast: boolean;
-			audioUrl: string | null;
-			audioType: string | null;
-			duration: string | null;
-		}> = [];
-		const failedFeeds: Array<{ url: string; error: string }> = [];
+		const allItems: FeedItem[] = [];
+		const failedFeeds: FailedFeed[] = [];
 
 		for (let i = 0; i < results.length; i++) {
 			const result = results[i];

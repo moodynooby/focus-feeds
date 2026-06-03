@@ -7,13 +7,13 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { Home, Menu as MenuIcon } from "lucide-react";
 import { useState } from "react";
+import TwitterFeedItem from "@/features/feeds/components/TwitterFeedItem";
 import type { FeedItem } from "@/types";
 import EmptyState from "../EmptyState";
 import FeedSidebar from "../feed-sidebar/FeedSidebar";
 import AppHeader from "../header/AppHeader";
 import OfflineBanner from "../shared/OfflineBanner";
 import SkeletonList from "../shared/SkeletonList";
-import TwitterFeedItem from "./TwitterFeedItem";
 
 interface TwitterLayoutProps {
 	searchQuery: string;

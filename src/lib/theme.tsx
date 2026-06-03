@@ -42,6 +42,7 @@ export const ModeContext = createContext<ModeContextValue>({
 });
 
 export const useModeContext = () => useContext(ModeContext);
+export const useColorModeContext = () => useContext(ColorModeContext);
 
 export const PODCAST_ACCENT = "#a855f7";
 export const PODCAST_ACCENT_RGB = "168, 85, 247";

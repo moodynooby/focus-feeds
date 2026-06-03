@@ -11,13 +11,13 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { Hash, Mail, Plus, Sparkles, Tag } from "lucide-react";
+import { Plus, Tag } from "lucide-react";
 import { useState } from "react";
-import { MODE_NAMES } from "@/lib/modes";
+import { MODE_CONFIG, MODE_NAMES } from "@/lib/modes";
 import { useModeContext } from "@/lib/theme";
+import { toggleListItem } from "@/lib/utils";
 import type { AppMode } from "@/types";
 import SearchField from "../filter-header/SearchField";
-import { toggleListItem } from "../utils";
 
 interface NavItem {
 	id: string;
@@ -204,13 +204,7 @@ export default function FeedSidebar({
 									"&:hover": { bgcolor: "action.hover" },
 								}}
 							>
-								{mod === "classic" ? (
-									<Sparkles size={20} />
-								) : mod === "gmail" ? (
-									<Mail size={20} />
-								) : (
-									<Hash size={20} />
-								)}
+								{MODE_CONFIG[mod].icon({ size: 20 })}
 							</Box>
 						))}
 					</Box>

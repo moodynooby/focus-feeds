@@ -21,8 +21,9 @@ import {
 	X,
 } from "lucide-react";
 import { useState } from "react";
+import SignIn from "@/features/auth/components/signIn";
+import type { InstallStatus } from "@/hooks/usePWAInstall";
 import type { AuthStatus, SyncStatus } from "@/types";
-import SignIn from "./signIn";
 
 interface SettingsDrawerProps {
 	open: boolean;
@@ -41,7 +42,7 @@ interface SettingsDrawerProps {
 	onSignOut: () => void;
 	deferredPrompt: Event | null;
 	onInstall: () => void;
-	installStatus: string;
+	installStatus: InstallStatus;
 }
 
 export default function SettingsDrawer({

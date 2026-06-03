@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-type InstallStatus = "available" | "installed" | "dismissed";
+export type InstallStatus = "available" | "installed" | "dismissed";
 
 interface UsePWAInstallReturn {
 	deferredPrompt: Event | null;

@@ -7,11 +7,10 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { formatDistanceToNow } from "date-fns";
 import { Heart, MessageSquare, Repeat } from "lucide-react";
-import Image from "next/image";
 import { memo } from "react";
+import PodcastBadge from "@/components/shared/PodcastBadge";
+import { getHostname } from "@/lib/utils";
 import type { FeedItem } from "@/types";
-import PodcastBadge from "../shared/PodcastBadge";
-import { getHostname } from "../utils";
 
 interface TwitterFeedItemProps {
 	item: FeedItem;
@@ -79,18 +78,8 @@ function TwitterFeedItem({ item }: TwitterFeedItemProps) {
 							width: 40,
 							height: 40,
 							bgcolor: "background.default",
-							p: 0.5,
 						}}
-					>
-						<Image
-							src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`}
-							alt={item.source}
-							width={32}
-							height={32}
-							style={{ borderRadius: 4 }}
-							unoptimized={false}
-						/>
-					</Avatar>
+					/>
 				</Box>
 
 				<Box sx={{ flex: 1, minWidth: 0 }}>

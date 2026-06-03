@@ -6,8 +6,8 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import { Headphones, Star } from "lucide-react";
 import { memo } from "react";
+import { formatDate } from "@/lib/utils";
 import type { FeedItem } from "@/types";
-import { formatDate } from "../utils";
 
 interface GmailFeedItemProps {
 	item: FeedItem;

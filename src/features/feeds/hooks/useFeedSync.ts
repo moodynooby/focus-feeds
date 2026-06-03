@@ -19,18 +19,21 @@ export default function useFeedSync(
 	});
 
 	const hasSyncedRef = useRef(false);
+	const urlsRef = useRef(urls);
+	urlsRef.current = urls;
 
 	useEffect(() => {
 		if (status !== "authenticated" || hasSyncedRef.current) return;
 		hasSyncedRef.current = true;
 
 		const syncUserFeeds = async () => {
+			const currentUrls = urlsRef.current;
 			setSyncStatus((prev) => ({ ...prev, loading: true, error: null }));
-			const result = await syncFeeds(urls, { mergeStrategy: "merge" });
+			const result = await syncFeeds(currentUrls, { mergeStrategy: "merge" });
 
 			if (result.success) {
 				const serverUrls = (result.feeds ?? []).map((f) => f.url);
-				if (JSON.stringify(serverUrls) !== JSON.stringify(urls)) {
+				if (JSON.stringify(serverUrls) !== JSON.stringify(currentUrls)) {
 					setUrls(serverUrls);
 				}
 				setSyncStatus({
@@ -51,7 +54,7 @@ export default function useFeedSync(
 		};
 
 		syncUserFeeds();
-	}, [status, urls, setUrls]);
+	}, [status, setUrls]);
 
 	return { syncStatus };
 }

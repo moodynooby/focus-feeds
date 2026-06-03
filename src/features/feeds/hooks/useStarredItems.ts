@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
-import { toggleListItem } from "@/components/utils";
+import { toggleListItem } from "@/lib/utils";
 import type { ViewMode } from "@/types";
 
 interface UseStarredItemsReturn {

@@ -12,9 +12,9 @@ import {
 	RefreshCw,
 } from "lucide-react";
 import { useMemo } from "react";
+import EmptyState from "@/components/EmptyState";
+import SkeletonList from "@/components/shared/SkeletonList";
 import type { FeedItem } from "@/types";
-import EmptyState from "../EmptyState";
-import SkeletonList from "../shared/SkeletonList";
 import GmailFeedItem from "./GmailFeedItem";
 
 interface GmailFeedListProps {

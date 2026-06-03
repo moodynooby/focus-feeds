@@ -4,11 +4,11 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Image from "next/image";
 import { memo } from "react";
+import PodcastPlayer from "@/components/PodcastPlayer";
+import PodcastBadge from "@/components/shared/PodcastBadge";
 import { PODCAST_ACCENT, PODCAST_ACCENT_RGB } from "@/lib/theme";
+import { formatDate, formatDuration, getHostname } from "@/lib/utils";
 import type { FeedItem as FeedItemType } from "@/types";
-import PodcastPlayer from "./PodcastPlayer";
-import PodcastBadge from "./shared/PodcastBadge";
-import { formatDate, formatDuration, getHostname } from "./utils";
 
 interface FeedItemProps {
 	item: FeedItemType;

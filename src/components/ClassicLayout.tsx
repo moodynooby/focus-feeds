@@ -1,8 +1,8 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import FeedList from "@/features/feeds/components/FeedList";
 import type { FailedFeed, FeedItem } from "@/types";
-import FeedList from "./FeedList";
 import SourceFilter from "./filter-header/SourceFilter";
 import AppHeader from "./header/AppHeader";
 import OfflineBanner from "./shared/OfflineBanner";

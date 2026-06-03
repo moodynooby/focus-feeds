@@ -4,10 +4,10 @@ import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import EmptyState from "@/components/EmptyState";
+import SkeletonList from "@/components/shared/SkeletonList";
+import FeedItem from "@/features/feeds/components/FeedItem";
 import type { FailedFeed, FeedItem as FeedItemType } from "@/types";
-import EmptyState from "./EmptyState";
-import FeedItem from "./FeedItem";
-import SkeletonList from "./shared/SkeletonList";
 
 interface FeedListProps {
 	loading: boolean;

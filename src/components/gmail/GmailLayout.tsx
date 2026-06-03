@@ -10,12 +10,12 @@ import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { Inbox, Menu as MenuIcon, Star } from "lucide-react";
 import { useState } from "react";
+import GmailArticleView from "@/features/feeds/components/GmailArticleView";
+import GmailFeedList from "@/features/feeds/components/GmailFeedList";
 import type { AuthStatus, FeedItem, ViewMode } from "@/types";
 import FeedSidebar from "../feed-sidebar/FeedSidebar";
 import AppHeader from "../header/AppHeader";
 import OfflineBanner from "../shared/OfflineBanner";
-import GmailArticleView from "./GmailArticleView";
-import GmailFeedList from "./GmailFeedList";
 
 interface GmailLayoutProps {
 	searchQuery: string;

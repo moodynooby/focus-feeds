@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { sql } from "./db";
+import { sql } from "@/lib/db";
 
 const SESSION_COOKIE_NAME = "focus-feeds-session";
 const SESSION_MAX_AGE = 30 * 24 * 60 * 60;

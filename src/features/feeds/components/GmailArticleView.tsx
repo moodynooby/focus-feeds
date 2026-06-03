@@ -15,10 +15,10 @@ import {
 	MoreVertical,
 	Trash2,
 } from "lucide-react";
+import PodcastPlayer from "@/components/PodcastPlayer";
+import RSSContent from "@/features/feeds/components/RSSContent";
+import { formatDate } from "@/lib/utils";
 import type { FeedItem } from "@/types";
-import PodcastPlayer from "../PodcastPlayer";
-import RSSContent from "../RSSContent";
-import { formatDate } from "../utils";
 
 interface GmailArticleViewProps {
 	item: FeedItem;

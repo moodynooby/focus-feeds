@@ -4,12 +4,11 @@ import IconButton from "@mui/material/IconButton";
 import { useTheme } from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
 import { Moon, Sun } from "lucide-react";
-import { useContext } from "react";
-import { ColorModeContext } from "@/lib/theme";
+import { useColorModeContext } from "@/lib/theme";
 
 export default function ColorModeToggle() {
 	const theme = useTheme();
-	const colorMode = useContext(ColorModeContext);
+	const colorMode = useColorModeContext();
 
 	return (
 		<Tooltip title={theme.palette.mode === "dark" ? "Light Mode" : "Dark Mode"}>
