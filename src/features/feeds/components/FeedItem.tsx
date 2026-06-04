@@ -12,9 +12,11 @@ import type { FeedItem as FeedItemType } from "@/types";
 
 interface FeedItemProps {
 	item: FeedItemType;
+	readerMode?: boolean;
+	onOpenReader?: (item: FeedItemType) => void;
 }
 
-function FeedItem({ item }: FeedItemProps) {
+function FeedItem({ item, readerMode = false, onOpenReader }: FeedItemProps) {
 	const hostname = getHostname(item.link);
 
 	return (
@@ -97,15 +99,22 @@ function FeedItem({ item }: FeedItemProps) {
 			<Box component="h3" sx={{ m: 0, mb: item.isPodcast ? 1 : 0 }}>
 				<Box
 					component="a"
-					href={item.link}
-					target="_blank"
-					rel="noreferrer"
+					href={readerMode ? "#" : item.link}
+					target={readerMode ? undefined : "_blank"}
+					rel={readerMode ? undefined : "noreferrer"}
+					onClick={(e: React.MouseEvent) => {
+						if (readerMode) {
+							e.preventDefault();
+							onOpenReader?.(item);
+						}
+					}}
 					sx={{
 						textDecoration: "none",
 						color: "text.primary",
 						fontSize: "1.1rem",
 						fontWeight: 600,
 						lineHeight: 1.4,
+						cursor: "pointer",
 						"&:hover": {
 							color: item.isPodcast ? PODCAST_ACCENT : "primary.main",
 						},

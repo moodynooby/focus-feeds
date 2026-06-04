@@ -8,6 +8,7 @@ import GmailLayout from "@/components/gmail/GmailLayout";
 import SettingsDrawer from "@/components/SettingsDrawer";
 import TwitterLayout from "@/components/twitter/TwitterLayout";
 import useAuth from "@/features/auth/hooks/useAuth";
+import ReaderView from "@/features/feeds/components/ReaderView";
 import useFeedFilters from "@/features/feeds/hooks/useFeedFilters";
 import useFeedSync from "@/features/feeds/hooks/useFeedSync";
 import useStarredItems from "@/features/feeds/hooks/useStarredItems";
@@ -16,7 +17,12 @@ import usePWAInstall from "@/hooks/usePWAInstall";
 import useServiceWorker from "@/hooks/useServiceWorker";
 import { useModeContext } from "@/lib/theme";
 import type { FeedDuration, FeedItem } from "@/types";
-import { addUserFeed, fetchFeeds, removeUserFeed } from "./actions";
+import {
+	addUserFeed,
+	fetchFeeds,
+	fetchFullArticle,
+	removeUserFeed,
+} from "./actions";
 
 const ITEMS_PER_BATCH = 20;
 
@@ -33,6 +39,11 @@ export default function FeedManager() {
 		"focusFeedsDuration",
 		"week",
 	);
+	const [readerMode, setReaderMode] = useLocalStorage(
+		"focusFeedsReaderMode",
+		false,
+	);
+	const [readerItem, setReaderItem] = useState<FeedItem | null>(null);
 	const { mode } = useModeContext();
 
 	const { data, error, isLoading, mutate } = useSWR(
@@ -156,6 +167,8 @@ export default function FeedManager() {
 				hasMoreItems={filters.hasMoreItems}
 				onLoadMore={filters.loadMore}
 				isOnline={isOnline}
+				readerMode={readerMode}
+				onOpenReader={(item: FeedItem) => setReaderItem(item)}
 			/>
 		);
 
@@ -181,7 +194,17 @@ export default function FeedManager() {
 				deferredPrompt={deferredPrompt}
 				onInstall={handleInstallClick}
 				installStatus={installStatus}
+				readerMode={readerMode}
+				onReaderModeChange={setReaderMode}
 			/>
+
+			{readerMode && readerItem && (
+				<ReaderView
+					item={readerItem}
+					onClose={() => setReaderItem(null)}
+					fetchFullArticle={fetchFullArticle}
+				/>
+			)}
 		</>
 	);
 }

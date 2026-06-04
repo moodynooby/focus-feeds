@@ -25,6 +25,8 @@ interface ClassicLayoutProps {
 	hasMoreItems?: boolean;
 	onLoadMore?: () => void;
 	isOnline?: boolean;
+	readerMode?: boolean;
+	onOpenReader?: (item: FeedItem) => void;
 }
 
 export default function ClassicLayout({
@@ -45,6 +47,8 @@ export default function ClassicLayout({
 	hasMoreItems,
 	onLoadMore,
 	isOnline = true,
+	readerMode = false,
+	onOpenReader,
 }: ClassicLayoutProps) {
 	return (
 		<>
@@ -77,6 +81,8 @@ export default function ClassicLayout({
 					hasMoreItems={hasMoreItems}
 					onLoadMore={onLoadMore}
 					totalCount={totalCount}
+					readerMode={readerMode}
+					onOpenReader={onOpenReader}
 				/>
 			</Box>
 		</>

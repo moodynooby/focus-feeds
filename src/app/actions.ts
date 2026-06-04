@@ -21,6 +21,69 @@ import type {
 	UserFeedResult,
 } from "@/types";
 
+export interface FetchFullArticleResult {
+	title: string;
+	content: string;
+	excerpt: string;
+	byline: string | null;
+	siteName: string | null;
+	length: number;
+}
+
+export async function fetchFullArticle(
+	url: string,
+): Promise<FetchFullArticleResult | { error: string }> {
+	try {
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+		const response = await fetch(url, {
+			signal: controller.signal,
+			headers: {
+				"User-Agent":
+					"Mozilla/5.0 (compatible; FocusFeeds/1.0; +https://focusfeeds.app)",
+				Accept:
+					"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+				"Accept-Language": "en-US,en;q=0.5",
+			},
+		});
+
+		clearTimeout(timeoutId);
+
+		if (!response.ok) {
+			return { error: `HTTP ${response.status}: ${response.statusText}` };
+		}
+
+		const html = await response.text();
+		const { parseHTML } = await import("linkedom");
+		const { Readability } = await import("@mozilla/readability");
+
+		const { document } = parseHTML(html);
+		const reader = new Readability(document);
+		const article = reader.parse();
+
+		if (!article) {
+			return { error: "Could not extract article content" };
+		}
+
+		return {
+			title: article.title || "",
+			content: article.content || "",
+			excerpt: article.excerpt || "",
+			byline: article.byline || null,
+			siteName: article.siteName || null,
+			length: article.length || 0,
+		};
+	} catch (error) {
+		const err = error as Error;
+		if (err.name === "AbortError") {
+			return { error: "Request timed out" };
+		}
+		console.error("fetchFullArticle error:", err);
+		return { error: err.message || "Failed to fetch article" };
+	}
+}
+
 interface FetchError extends Error {
 	code?: string;
 }

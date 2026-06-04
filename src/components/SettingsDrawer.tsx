@@ -6,6 +6,7 @@ import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import Input from "@mui/material/Input";
 import Paper from "@mui/material/Paper";
+import Switch from "@mui/material/Switch";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import ToggleButton from "@mui/material/ToggleButton";
@@ -43,6 +44,8 @@ interface SettingsDrawerProps {
 	deferredPrompt: Event | null;
 	onInstall: () => void;
 	installStatus: InstallStatus;
+	readerMode: boolean;
+	onReaderModeChange: (value: boolean) => void;
 }
 
 export default function SettingsDrawer({
@@ -63,6 +66,8 @@ export default function SettingsDrawer({
 	deferredPrompt,
 	onInstall,
 	installStatus = "available",
+	readerMode,
+	onReaderModeChange,
 }: SettingsDrawerProps) {
 	const [activeTab, setActiveTab] = useState(0);
 	const [newUrl, setNewUrl] = useState("");
@@ -299,6 +304,29 @@ export default function SettingsDrawer({
 											Clear Cache
 										</Button>
 									</Box>
+								</Box>
+							</Paper>
+
+							<Paper variant="outlined" sx={{ p: 2 }}>
+								<Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
+									Reader Mode
+								</Typography>
+								<Box
+									sx={{
+										display: "flex",
+										justifyContent: "space-between",
+										alignItems: "center",
+									}}
+								>
+									<Box sx={{ flex: 1 }}>
+										<Typography variant="body2" color="text.secondary">
+											Open articles in-app as a clean reading view
+										</Typography>
+									</Box>
+									<Switch
+										checked={readerMode}
+										onChange={(e) => onReaderModeChange(e.target.checked)}
+									/>
 								</Box>
 							</Paper>
 
