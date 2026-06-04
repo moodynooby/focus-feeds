@@ -18,6 +18,8 @@ interface FeedListProps {
 	hasMoreItems?: boolean;
 	onLoadMore?: () => void;
 	totalCount?: number;
+	readerMode?: boolean;
+	onOpenReader?: (item: FeedItemType) => void;
 }
 
 export default function FeedList({
@@ -29,6 +31,8 @@ export default function FeedList({
 	hasMoreItems,
 	onLoadMore,
 	totalCount,
+	readerMode = false,
+	onOpenReader,
 }: FeedListProps) {
 	if (loading && items.length === 0) {
 		return <SkeletonList />;
@@ -66,7 +70,12 @@ export default function FeedList({
 			)}
 
 			{items.map((item) => (
-				<FeedItem key={item.guid || item.link} item={item} />
+				<FeedItem
+					key={item.guid || item.link}
+					item={item}
+					readerMode={readerMode}
+					onOpenReader={onOpenReader}
+				/>
 			))}
 
 			{hasMoreItems && (
