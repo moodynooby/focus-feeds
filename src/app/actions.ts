@@ -55,11 +55,11 @@ export async function fetchFullArticle(
 		}
 
 		const html = await response.text();
-		const { JSDOM } = await import("jsdom");
+		const { parseHTML } = await import("linkedom");
 		const { Readability } = await import("@mozilla/readability");
 
-		const doc = new JSDOM(html, { url });
-		const reader = new Readability(doc.window.document);
+		const { document } = parseHTML(html);
+		const reader = new Readability(document);
 		const article = reader.parse();
 
 		if (!article) {
