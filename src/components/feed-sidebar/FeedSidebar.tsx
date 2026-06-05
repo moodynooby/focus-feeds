@@ -184,29 +184,32 @@ export default function FeedSidebar({
 						Apps / Views
 					</Typography>
 					<Box sx={{ display: "flex", gap: 0.5, mt: 0.5 }}>
-						{MODE_NAMES.map((mod) => (
-							<Box
-								key={mod}
-								component="button"
-								onClick={() => setMode(mod as AppMode)}
-								sx={{
-									display: "flex",
-									alignItems: "center",
-									justifyContent: "center",
-									width: 40,
-									height: 40,
-									border: "none",
-									borderRadius: 999,
-									background: "transparent",
-									cursor: "pointer",
-									color: mode === mod ? "primary.main" : "text.secondary",
-									bgcolor: mode === mod ? "primary.light" : "transparent",
-									"&:hover": { bgcolor: "action.hover" },
-								}}
-							>
-								{MODE_CONFIG[mod].icon({ size: 20 })}
-							</Box>
-						))}
+						{MODE_NAMES.map((mod) => {
+							const Icon = MODE_CONFIG[mod].icon;
+							return (
+								<Box
+									key={mod}
+									component="button"
+									onClick={() => setMode(mod as AppMode)}
+									sx={{
+										display: "flex",
+										alignItems: "center",
+										justifyContent: "center",
+										width: 40,
+										height: 40,
+										border: "none",
+										borderRadius: 999,
+										background: "transparent",
+										cursor: "pointer",
+										color: mode === mod ? "primary.main" : "text.secondary",
+										bgcolor: mode === mod ? "primary.light" : "transparent",
+										"&:hover": { bgcolor: "action.hover" },
+									}}
+								>
+									<Icon size={20} />
+								</Box>
+							);
+						})}
 					</Box>
 				</Box>
 			)}
