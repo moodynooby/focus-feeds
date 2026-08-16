@@ -34,6 +34,8 @@ interface AppHeaderProps {
 	rightSlot?: React.ReactNode;
 	mobileExtraItems?: React.ReactNode;
 	fixed?: boolean;
+	/** Hide the mode-switch menu in the header (e.g. twitter mode). */
+	hideModeMenu?: boolean;
 }
 
 export default function AppHeader({
@@ -51,6 +53,7 @@ export default function AppHeader({
 	rightSlot,
 	mobileExtraItems,
 	fixed = false,
+	hideModeMenu = false,
 }: AppHeaderProps) {
 	const { mode } = useModeContext();
 	const [mobileExpanded, setMobileExpanded] = useState(false);
@@ -145,6 +148,7 @@ export default function AppHeader({
 						onOpenSettings={onOpenSettings}
 						onClearFilters={onClearFilters}
 						loading={loading}
+						hideModeMenu={hideModeMenu}
 					/>
 					{rightSlot}
 				</Box>

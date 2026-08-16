@@ -2,18 +2,13 @@
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { Home, Menu as MenuIcon } from "lucide-react";
-import { useState } from "react";
+import Typography from "@mui/material/Typography";
+import EmptyState from "@/components/EmptyState";
+import BaseLayout from "@/components/layouts/BaseLayout";
+import SkeletonList from "@/components/shared/SkeletonList";
 import TwitterFeedItem from "@/features/feeds/components/TwitterFeedItem";
+import { MODE_CONFIG } from "@/lib/modes";
 import type { FeedItem } from "@/types";
-import EmptyState from "../EmptyState";
-import FeedSidebar from "../feed-sidebar/FeedSidebar";
-import AppHeader from "../header/AppHeader";
-import OfflineBanner from "../shared/OfflineBanner";
-import SkeletonList from "../shared/SkeletonList";
 
 interface TwitterLayoutProps {
 	searchQuery: string;
@@ -34,6 +29,16 @@ interface TwitterLayoutProps {
 	isOnline?: boolean;
 }
 
+const twitterConfig = MODE_CONFIG.twitter;
+
+/**
+ * Twitter mode layout — pure content composition over the shared BaseLayout.
+ *
+ * Behavior differences preserved from the original implementation:
+ * - the single "Home" nav item clears all filters when tapped,
+ * - "Show more" appears when filtered results are paginated,
+ * - the header mode menu is hidden (mode switching lives in the sidebar).
+ */
 export default function TwitterLayout({
 	searchQuery,
 	onSearchChange,
@@ -52,127 +57,80 @@ export default function TwitterLayout({
 	onLoadMore,
 	isOnline = true,
 }: TwitterLayoutProps) {
-	const theme = useTheme();
-	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-	const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
-	const [activeNav, setActiveNav] = useState("home");
+	const showSkeleton = loading && items.length === 0;
 
-	const navItems = [{ id: "home", label: "Home", icon: <Home size={20} /> }];
-
-	return (
-		<Box
-			sx={{
-				display: "flex",
-				height: "100vh",
-				overflow: "hidden",
-				pt: "64px",
-			}}
-		>
-			{!isOnline && <OfflineBanner variant="fixed" />}
-
-			<AppHeader
-				fixed
-				onRefresh={onRefresh}
-				onOpenSettings={onOpenSettings}
-				onClearFilters={onClearFilters}
-				filteredCount={filteredCount}
-				totalCount={totalCount}
-				loading={loading}
-				leftSlot={
-					<IconButton
-						edge="start"
-						color="inherit"
-						onClick={() => setSidebarOpen(!sidebarOpen)}
+	const content = showSkeleton ? (
+		<SkeletonList rows={10} />
+	) : error ? (
+		<EmptyState
+			message="Error loading feeds"
+			actionLabel="Retry"
+			onAction={onRefresh}
+		/>
+	) : items.length === 0 ? (
+		<EmptyState
+			message="No articles found"
+			actionLabel="Adjust filters"
+			onAction={onRefresh}
+		/>
+	) : (
+		<>
+			{items.map((item) => (
+				<TwitterFeedItem key={item.guid || item.link} item={item} />
+			))}
+			{hasMoreItems && (
+				<Box sx={{ textAlign: "center", py: 3 }}>
+					<Button
+						variant="outlined"
+						onClick={onLoadMore}
+						sx={{ borderRadius: 999, fontWeight: 700 }}
 					>
-						<MenuIcon size={24} />
-					</IconButton>
-				}
-			/>
-
-			<FeedSidebar
-				open={sidebarOpen}
-				onClose={() => setSidebarOpen(false)}
-				isMobile={isMobile}
-				searchQuery={searchQuery}
-				onSearchChange={onSearchChange}
-				navItems={navItems}
-				activeNav={activeNav}
-				onNavChange={(id) => {
-					setActiveNav(id);
-					if (id === "home") {
-						onClearFilters();
-					}
-					if (isMobile) setSidebarOpen(false);
-				}}
-				showModeSwitcher
-				sources={sources}
-				selectedSources={selectedSources}
-				onSourcesChange={onSourcesChange}
-				sourceSectionLabel="Accounts you follow"
-			/>
-
-			<Box
-				component="main"
-				sx={{
-					flexGrow: 1,
-					height: "100%",
-					overflow: "auto",
-					display: "flex",
-					justifyContent: "center",
-				}}
-			>
-				<Box
+						Show more
+					</Button>
+				</Box>
+			)}
+			{filteredCount !== undefined && totalCount !== undefined && (
+				<Typography
+					variant="caption"
 					sx={{
-						maxWidth: "600px",
-						width: "100%",
-						pb: 4,
-						pt: 2,
-						px: 2,
+						display: "block",
+						textAlign: "center",
+						mt: 2,
+						mb: 4,
+						opacity: 0.6,
 					}}
 				>
-					{loading && items.length === 0 ? (
-						<SkeletonList rows={10} />
-					) : error ? (
-						<EmptyState
-							message="Error loading feeds"
-							actionLabel={error ? "Retry" : undefined}
-							onAction={onRefresh}
-						/>
-					) : items.length === 0 ? (
-						<EmptyState
-							message="No articles found"
-							actionLabel="Adjust filters"
-							onAction={onRefresh}
-						/>
-					) : (
-						<>
-							{items.map((item) => (
-								<TwitterFeedItem key={item.guid || item.link} item={item} />
-							))}
+					{filteredCount} of {totalCount} items
+				</Typography>
+			)}
+		</>
+	);
 
-							{hasMoreItems && (
-								<Box
-									sx={{
-										textAlign: "center",
-										py: 3,
-									}}
-								>
-									<Button
-										variant="outlined"
-										onClick={onLoadMore}
-										sx={{
-											borderRadius: 999,
-											fontWeight: 700,
-										}}
-									>
-										Show more
-									</Button>
-								</Box>
-							)}
-						</>
-					)}
-				</Box>
+	return (
+		<BaseLayout
+			onRefresh={onRefresh}
+			onOpenSettings={onOpenSettings}
+			loading={loading}
+			filteredCount={filteredCount}
+			totalCount={totalCount}
+			isOnline={isOnline}
+			navItems={twitterConfig.sidebarNavItems}
+			activeNav="home"
+			onNavChange={(id) => {
+				if (id === "home") onClearFilters();
+			}}
+			sources={sources}
+			selectedSources={selectedSources}
+			onSourcesChange={onSourcesChange}
+			sourceSectionLabel={twitterConfig.sourceSectionLabel}
+			showModeSwitcher={twitterConfig.showModeSwitcher}
+			hideHeaderModeMenu={twitterConfig.hideHeaderModeMenu}
+			searchQuery={searchQuery}
+			onSearchChange={onSearchChange}
+		>
+			<Box sx={{ maxWidth: "600px", width: "100%", pb: 4, pt: 2, px: 2 }}>
+				{content}
 			</Box>
-		</Box>
+		</BaseLayout>
 	);
 }

@@ -75,7 +75,7 @@ export default function FeedManager() {
 		}
 	}, [status, urls.length, setUrls]);
 
-	const { syncStatus } = useFeedSync(status, urls, setUrls);
+	const { syncStatus, markSyncError } = useFeedSync({ status, urls, setUrls });
 
 	const filters = useFeedFilters(items, ITEMS_PER_BATCH, {
 		starredItems,
@@ -89,7 +89,7 @@ export default function FeedManager() {
 			if (status === "authenticated") {
 				const result = await addUserFeed(newUrl);
 				if (!result.success) {
-					console.error("Failed to add feed remotely");
+					markSyncError(result.error ?? "Failed to add feed to account");
 				}
 			}
 		}
@@ -101,7 +101,7 @@ export default function FeedManager() {
 		if (status === "authenticated") {
 			const result = await removeUserFeed(urlToRemove);
 			if (!result.success) {
-				console.error("Failed to remove feed remotely");
+				markSyncError(result.error ?? "Failed to remove feed from account");
 			}
 		}
 	};

@@ -4,7 +4,6 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import { FilterX, RefreshCw, Settings } from "lucide-react";
-import { useModeContext } from "@/lib/theme";
 import ColorModeToggle from "./ColorModeToggle";
 import ModeMenu from "./ModeMenu";
 
@@ -13,6 +12,8 @@ interface HeaderActionsProps {
 	onOpenSettings: () => void;
 	onClearFilters?: () => void;
 	loading?: boolean;
+	/** Hide the mode-switch menu in the header (e.g. twitter mode). */
+	hideModeMenu?: boolean;
 }
 
 export default function HeaderActions({
@@ -20,11 +21,11 @@ export default function HeaderActions({
 	onOpenSettings,
 	onClearFilters,
 	loading = false,
+	hideModeMenu = false,
 }: HeaderActionsProps) {
-	const { mode } = useModeContext();
 	return (
 		<Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-			{mode !== "twitter" && <ModeMenu />}
+			{!hideModeMenu && <ModeMenu />}
 			<ColorModeToggle />
 			{onClearFilters && (
 				<Tooltip title="Clear all filters">

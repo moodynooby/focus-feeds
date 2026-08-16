@@ -5,17 +5,13 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { Inbox, Menu as MenuIcon, Star } from "lucide-react";
 import { useState } from "react";
+import BaseLayout from "@/components/layouts/BaseLayout";
 import GmailArticleView from "@/features/feeds/components/GmailArticleView";
 import GmailFeedList from "@/features/feeds/components/GmailFeedList";
+import { MODE_CONFIG } from "@/lib/modes";
 import type { AuthStatus, FeedItem, ViewMode } from "@/types";
-import FeedSidebar from "../feed-sidebar/FeedSidebar";
-import AppHeader from "../header/AppHeader";
-import OfflineBanner from "../shared/OfflineBanner";
 
 interface GmailLayoutProps {
 	searchQuery: string;
@@ -37,6 +33,8 @@ interface GmailLayoutProps {
 	isOnline?: boolean;
 }
 
+const gmailConfig = MODE_CONFIG.gmail;
+
 export default function GmailLayout({
 	searchQuery,
 	onSearchChange,
@@ -56,9 +54,6 @@ export default function GmailLayout({
 	onViewChange,
 	isOnline = true,
 }: GmailLayoutProps) {
-	const theme = useTheme();
-	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-	const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
 	const [selectedArticle, setSelectedArticle] = useState<FeedItem | null>(null);
 	const [anchorElProfile, setAnchorElProfile] = useState<HTMLElement | null>(
 		null,
@@ -67,11 +62,6 @@ export default function GmailLayout({
 	const handleOpenProfile = (event: React.MouseEvent<HTMLElement>) =>
 		setAnchorElProfile(event.currentTarget);
 	const handleCloseProfile = () => setAnchorElProfile(null);
-
-	const navItems = [
-		{ id: "inbox", label: "Inbox", icon: <Inbox size={20} /> },
-		{ id: "starred", label: "Starred", icon: <Star size={20} /> },
-	];
 
 	const rightSlot = (
 		<>
@@ -116,92 +106,56 @@ export default function GmailLayout({
 		</>
 	);
 
+	const content = selectedArticle ? (
+		<GmailArticleView
+			item={selectedArticle}
+			onBack={() => setSelectedArticle(null)}
+		/>
+	) : (
+		<GmailFeedList
+			items={items}
+			starredItems={starredItems}
+			onToggleStar={onToggleStar}
+			onSelectItem={setSelectedArticle}
+			loading={loading}
+			onRefresh={onRefresh}
+		/>
+	);
+
 	return (
-		<Box
-			sx={{
-				display: "flex",
-				height: "100vh",
-				overflow: "hidden",
-				pt: "64px",
+		<BaseLayout
+			onRefresh={onRefresh}
+			onOpenSettings={onOpenSettings}
+			loading={loading}
+			isOnline={isOnline}
+			searchQuery={searchQuery}
+			onSearchChange={onSearchChange}
+			navItems={gmailConfig.sidebarNavItems}
+			activeNav={view}
+			onNavChange={(id) => {
+				onViewChange(id as ViewMode);
+				setSelectedArticle(null);
 			}}
+			sources={sources}
+			selectedSources={selectedSources}
+			onSourcesChange={onSourcesChange}
+			sourceSectionLabel={gmailConfig.sourceSectionLabel}
+			showModeSwitcher={gmailConfig.showModeSwitcher}
+			onAddFeed={onAddFeed}
+			rightSlot={rightSlot}
 		>
-			{!isOnline && <OfflineBanner variant="fixed" />}
-			<AppHeader
-				fixed
-				searchQuery={searchQuery}
-				onSearchChange={onSearchChange}
-				onRefresh={onRefresh}
-				onOpenSettings={onOpenSettings}
-				leftSlot={
-					<IconButton
-						edge="start"
-						color="inherit"
-						onClick={() => setSidebarOpen(!sidebarOpen)}
-					>
-						<MenuIcon size={24} />
-					</IconButton>
-				}
-				rightSlot={rightSlot}
-			/>
-			<FeedSidebar
-				open={sidebarOpen}
-				onClose={() => setSidebarOpen(false)}
-				isMobile={isMobile}
-				navItems={navItems}
-				activeNav={view}
-				onNavChange={(id) => {
-					onViewChange(id as ViewMode);
-					setSelectedArticle(null);
-					if (isMobile) setSidebarOpen(false);
-				}}
-				sources={sources}
-				selectedSources={selectedSources}
-				onSourcesChange={onSourcesChange}
-				onAddFeed={onAddFeed}
-				sourceSectionLabel="Labels"
-			/>
 			<Box
-				component="main"
 				sx={{
-					flexGrow: 1,
-					height: "100%",
-					display: "flex",
-					flexDirection: "column",
-					bgcolor: "background.default",
-					transition: (t) =>
-						t.transitions.create("margin", {
-							easing: t.transitions.easing.sharp,
-							duration: t.transitions.duration.leavingScreen,
-						}),
+					m: 2,
+					flex: 1,
+					bgcolor: "background.paper",
+					borderRadius: 4,
+					overflow: "hidden",
+					height: "calc(100% - 16px)",
 				}}
 			>
-				<Box
-					sx={{
-						m: 2,
-						ml: 0,
-						flex: 1,
-						bgcolor: "background.paper",
-						borderRadius: 4,
-						overflow: "hidden",
-					}}
-				>
-					{selectedArticle ? (
-						<GmailArticleView
-							item={selectedArticle}
-							onBack={() => setSelectedArticle(null)}
-						/>
-					) : (
-						<GmailFeedList
-							items={items}
-							starredItems={starredItems}
-							onToggleStar={onToggleStar}
-							onSelectItem={setSelectedArticle}
-							loading={loading}
-							onRefresh={onRefresh}
-						/>
-					)}
-				</Box>
+				{content}
 			</Box>
-		</Box>
+		</BaseLayout>
 	);
 }

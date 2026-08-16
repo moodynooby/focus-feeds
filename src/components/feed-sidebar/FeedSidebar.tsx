@@ -16,10 +16,9 @@ import { useState } from "react";
 import { MODE_CONFIG, MODE_NAMES } from "@/lib/modes";
 import { useModeContext } from "@/lib/theme";
 import { toggleListItem } from "@/lib/utils";
-import type { AppMode } from "@/types";
 import SearchField from "../filter-header/SearchField";
 
-interface NavItem {
+export interface NavItem {
 	id: string;
 	label: string;
 	icon: React.ReactNode;
@@ -51,8 +50,8 @@ interface FeedSidebarProps {
 const DRAWER_WIDTH = 256;
 
 export default function FeedSidebar({
-	open,
-	onClose,
+	open: openProp = true,
+	onClose = () => {},
 	isMobile,
 	searchQuery,
 	onSearchChange,
@@ -66,8 +65,12 @@ export default function FeedSidebar({
 	onAddFeed,
 	sourceSectionLabel,
 }: FeedSidebarProps) {
-	const { mode, setMode } = useModeContext();
+	// Sidebar starts open on desktop, closed on mobile. On mobile it behaves
+	// as a temporary drawer and must be closed via onClose after a tap.
+	const [manuallyClosed, setManuallyClosed] = useState(false);
+	const open = isMobile ? !manuallyClosed : openProp;
 	const [sourceCollapsed, setSourceCollapsed] = useState(false);
+	const { mode, setMode } = useModeContext();
 
 	const filtersActive = selectedSources.length > 0 || Boolean(searchQuery);
 
@@ -77,14 +80,20 @@ export default function FeedSidebar({
 		} else {
 			onNavChange(id);
 		}
-		if (isMobile) onClose();
+		if (isMobile) {
+			setManuallyClosed(true);
+			onClose();
+		}
 	};
 
 	return (
 		<Drawer
 			variant={isMobile ? "temporary" : "permanent"}
 			open={open}
-			onClose={onClose}
+			onClose={() => {
+				setManuallyClosed(true);
+				onClose();
+			}}
 			sx={{
 				width: open || !isMobile ? DRAWER_WIDTH : 0,
 				flexShrink: 0,
@@ -190,7 +199,7 @@ export default function FeedSidebar({
 								<Box
 									key={mod}
 									component="button"
-									onClick={() => setMode(mod as AppMode)}
+									onClick={() => setMode(mod)}
 									sx={{
 										display: "flex",
 										alignItems: "center",

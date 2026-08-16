@@ -1,11 +1,10 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import SourceFilter from "@/components/filter-header/SourceFilter";
+import BaseLayout from "@/components/layouts/BaseLayout";
 import FeedList from "@/features/feeds/components/FeedList";
 import type { FailedFeed, FeedItem } from "@/types";
-import SourceFilter from "./filter-header/SourceFilter";
-import AppHeader from "./header/AppHeader";
-import OfflineBanner from "./shared/OfflineBanner";
 
 interface ClassicLayoutProps {
 	searchQuery: string;
@@ -51,26 +50,24 @@ export default function ClassicLayout({
 	onOpenReader,
 }: ClassicLayoutProps) {
 	return (
-		<>
-			{!isOnline && <OfflineBanner />}
-			<AppHeader
-				searchQuery={searchQuery}
-				onSearchChange={onSearchChange}
-				sourceFilter={
-					<SourceFilter
-						sources={sources}
-						selectedSources={selectedSources}
-						onChange={onSourcesChange}
-					/>
-				}
-				onRefresh={onRefresh}
-				onOpenSettings={onOpenSettings}
-				onClearFilters={onClearFilters}
-				filteredCount={filteredCount}
-				totalCount={totalCount}
-				loading={loading}
-			/>
-
+		<BaseLayout
+			onRefresh={onRefresh}
+			onOpenSettings={onOpenSettings}
+			onClearFilters={onClearFilters}
+			filteredCount={filteredCount}
+			totalCount={totalCount}
+			loading={loading}
+			isOnline={isOnline}
+			sourceFilter={
+				<SourceFilter
+					sources={sources}
+					selectedSources={selectedSources}
+					onChange={onSourcesChange}
+				/>
+			}
+			searchQuery={searchQuery}
+			onSearchChange={onSearchChange}
+		>
 			<Box sx={{ maxWidth: "800px", mx: "auto", pb: 4, pt: 2 }}>
 				<FeedList
 					loading={loading}
@@ -85,6 +82,6 @@ export default function ClassicLayout({
 					onOpenReader={onOpenReader}
 				/>
 			</Box>
-		</>
+		</BaseLayout>
 	);
 }
