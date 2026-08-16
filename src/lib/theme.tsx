@@ -360,29 +360,16 @@ const getTwitterDesignTokens = (mode: Mode) => ({
 });
 
 export default function ThemeRegistry({ children }: { children: ReactNode }) {
-	const [colorMode, setColorMode] = useState<Mode>("dark");
+	const [colorMode, setColorMode] = useLocalStorage<Mode>("themeMode", "dark");
 	const [appMode, setAppMode] = useLocalStorage<AppMode>(
 		"focusFeedsMode",
 		"classic",
 	);
 	const [_isPending, startTransition] = useTransition();
 
-	useEffect(() => {
-		if (typeof window !== "undefined") {
-			const savedMode = localStorage.getItem("themeMode") as Mode | null;
-			if (savedMode) {
-				setColorMode(savedMode);
-			}
-		}
-	}, []);
-
 	const colorModeContext: ColorModeContextValue = {
 		toggleColorMode: () => {
-			setColorMode((prev) => {
-				const next = prev === "light" ? "dark" : "light";
-				localStorage.setItem("themeMode", next);
-				return next;
-			});
+			setColorMode(colorMode === "light" ? "dark" : "light");
 		},
 	};
 

@@ -27,6 +27,11 @@ export async function getOrCreateUser(
 
 	const hashedPassphrase = await hashPassphrase(passphrase.trim());
 
+	if (!process.env.DATABASE_URL) {
+		console.error("CRITICAL: DATABASE_URL is not set in environment");
+		return null;
+	}
+
 	try {
 		const existingUsers = await sql`
       SELECT id, passphrase, "createdAt" FROM "User"
@@ -44,9 +49,16 @@ export async function getOrCreateUser(
       RETURNING id, passphrase, "createdAt"
     `;
 
+		if (!newUsers || newUsers.length === 0) {
+			throw new Error("Insert failed to return a user record");
+		}
+
 		return newUsers[0] as UserRecord;
 	} catch (error) {
-		console.error("Error in getOrCreateUser:", error);
+		console.error(
+			"Error in getOrCreateUser:",
+			error instanceof Error ? error.message : error,
+		);
 		return null;
 	}
 }

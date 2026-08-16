@@ -15,7 +15,7 @@ import { useMemo } from "react";
 import EmptyState from "@/components/EmptyState";
 import SkeletonList from "@/components/shared/SkeletonList";
 import type { FeedItem } from "@/types";
-import GmailFeedItem from "./GmailFeedItem";
+import FeedItemRenderer from "./FeedItemRenderer";
 
 interface GmailFeedListProps {
 	items: FeedItem[];
@@ -71,9 +71,10 @@ export default function GmailFeedList({
 				)}
 				{!showSkeleton &&
 					items.map((item) => (
-						<GmailFeedItem
+						<FeedItemRenderer
 							key={item.guid || item.link}
 							item={item}
+							variant="gmail"
 							isStarred={starredSet.has(item.guid || item.link)}
 							onToggleStar={onToggleStar}
 							onClick={() => onSelectItem(item)}

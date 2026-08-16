@@ -6,7 +6,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import EmptyState from "@/components/EmptyState";
 import SkeletonList from "@/components/shared/SkeletonList";
-import FeedItem from "@/features/feeds/components/FeedItem";
+import FeedItemRenderer from "@/features/feeds/components/FeedItemRenderer";
 import type { FailedFeed, FeedItem as FeedItemType } from "@/types";
 
 interface FeedListProps {
@@ -70,9 +70,10 @@ export default function FeedList({
 			)}
 
 			{items.map((item) => (
-				<FeedItem
+				<FeedItemRenderer
 					key={item.guid || item.link}
 					item={item}
+					variant="classic"
 					readerMode={readerMode}
 					onOpenReader={onOpenReader}
 				/>

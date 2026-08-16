@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import EmptyState from "@/components/EmptyState";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import SkeletonList from "@/components/shared/SkeletonList";
-import TwitterFeedItem from "@/features/feeds/components/TwitterFeedItem";
+import FeedItemRenderer from "@/features/feeds/components/FeedItemRenderer";
 import { MODE_CONFIG } from "@/lib/modes";
 import type { FeedItem } from "@/types";
 
@@ -76,7 +76,11 @@ export default function TwitterLayout({
 	) : (
 		<>
 			{items.map((item) => (
-				<TwitterFeedItem key={item.guid || item.link} item={item} />
+				<FeedItemRenderer
+					key={item.guid || item.link}
+					item={item}
+					variant="twitter"
+				/>
 			))}
 			{hasMoreItems && (
 				<Box sx={{ textAlign: "center", py: 3 }}>

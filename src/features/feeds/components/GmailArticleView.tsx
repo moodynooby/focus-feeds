@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import PodcastPlayer from "@/components/PodcastPlayer";
 import RSSContent from "@/features/feeds/components/RSSContent";
+import { articleContentStyles } from "@/lib/styles";
 import { formatDate } from "@/lib/utils";
 import type { FeedItem } from "@/types";
 
@@ -103,34 +104,7 @@ export default function GmailArticleView({
 				</Box>
 				<RSSContent
 					content={DOMPurify.sanitize(item.content)}
-					sx={{
-						lineHeight: 1.6,
-						fontSize: "1rem",
-						color: "text.primary",
-						"& a": { color: "primary.main", textDecoration: "none" },
-						"& a:hover": { textDecoration: "underline" },
-						"& p": { mb: 2 },
-						"& ul, & ol": { mb: 2, pl: 4 },
-						"& li": { mb: 1 },
-						"& blockquote": {
-							borderLeft: "4px solid",
-							borderColor: "divider",
-							pl: 2,
-							ml: 0,
-							my: 2,
-							color: "text.secondary",
-							fontStyle: "italic",
-						},
-						"& pre": {
-							bgcolor: "action.hover",
-							p: 2,
-							borderRadius: 1,
-							overflowX: "auto",
-							fontFamily: "monospace",
-							fontSize: "0.9rem",
-							my: 2,
-						},
-					}}
+					sx={articleContentStyles}
 				/>
 				{item.isPodcast && (
 					<Box sx={{ mt: 4 }}>
